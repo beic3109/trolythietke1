@@ -3,132 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRỢ LÝ THIẾT KẾ</title>
+    <title>Trợ Lý Thiết Kế - Hoằng Pháp Lợi Sanh</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- KHO FONT CHỮ MỚI ĐƯỢC CẬP NHẬT THEO YÊU CẦU -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Be+Vietnam+Pro:wght@700&family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Be+Vietnam+Pro:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Be Vietnam Pro', sans-serif; }
-        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #4f46e5; border-radius: 50%; width: 60px; height: 60px; animation: spin 1.5s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Styling cho các lựa chọn được check */
+        /* --- General Styling --- */
+        body { 
+            font-family: 'Be Vietnam Pro', sans-serif; 
+            background-color: #FDF8E1; /* Màu nền vàng kem */
+            color: #422006; /* Màu chữ nâu đậm */
+        }
+        
+        /* --- Font Styles --- */
+        .font-display { font-family: 'Playfair Display', serif; }
+        .font-body { font-family: 'Be Vietnam Pro', sans-serif; }
+
+        /* --- Loader Animation --- */
+        .loader { 
+            border: 5px solid #D1C4A8; /* Màu nâu nhạt */
+            border-top: 5px solid #8C5A2B; /* Màu nâu đậm */
+            border-radius: 50%; 
+            width: 60px; 
+            height: 60px; 
+            animation: spin 1.5s linear infinite; 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* --- Custom UI Component Styling --- */
         .choice-selector input:checked + label {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+            border-color: #D97706; /* Vàng cam */
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
+            background-color: #FEF3C7; /* Vàng rất nhạt */
         }
         .color-swatch {
-            width: 1.75rem;
-            height: 1.75rem;
+            width: 1.75rem; height: 1.75rem;
             border-radius: 9999px;
-            border: 2px solid rgba(0,0,0,0.2);
+            border: 2px solid rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }
         .choice-selector input:checked + label .color-swatch {
-            transform: scale(1.2);
+            transform: scale(1.25);
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
         }
-        .modal {
-            transition: opacity 0.25s ease;
+        
+        /* --- Accordion (Details/Summary) Styling --- */
+        details > summary {
+            list-style: none;
+            cursor: pointer;
         }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        details[open] .accordion-icon {
+            transform: rotate(90deg);
+        }
+
+        /* --- Responsive Layout Control --- */
+        /* Hide desktop result view on small screens */
+        #desktop-result-view { display: none; }
+        /* When results are shown on desktop, hide the placeholder */
+        body.results-shown-desktop #desktop-result-view { display: flex; }
+        body.results-shown-desktop #placeholder-view { display: none; }
+
     </style>
 </head>
-<body class="bg-[#fffbbe]">
+<body class="font-body">
 
-    <main class="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8 space-y-8 my-8">
-        <header class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-indigo-600" style="font-family: 'Playfair Display', serif;">TRỢ LÝ THIẾT KẾ</h1>
-            <p class="text-gray-500 mt-2">Hỗ trợ các Sư Huynh Hoằng Pháp Lợi Sanh.</p>
-        </header>
-
-        <!-- 1. Tùy chỉnh -->
-        <section>
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Bước 1: Tùy Chỉnh Phong Cách</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                <!-- Cột trái: Văn bản chính -->
-                <div class="space-y-6 p-4 border border-gray-200 rounded-lg">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3 text-center">Văn Bản Chính</h3>
-                    <div>
-                        <label class="font-semibold text-sm">Font chữ</label>
-                        <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="main-font-selector"></div>
-                    </div>
-                    <div>
-                        <label class="font-semibold text-sm">Kiểu Hiển Thị & Màu Sắc</label>
-                        <div class="flex flex-col space-y-2 choice-selector mt-2" id="main-style-selector"></div>
-                        <div class="grid grid-cols-4 gap-3 choice-selector mt-3" id="main-color-selector"></div>
-                    </div>
-                    <div>
-                        <label class="font-semibold text-sm">Vị trí</label>
-                        <div class="flex flex-col space-y-2 choice-selector mt-2" id="main-position-selector"></div>
-                    </div>
-                    <div>
-                        <label class="font-semibold text-sm">Kích thước</label>
-                        <div class="grid grid-cols-3 gap-2 choice-selector mt-2" id="size-selector"></div>
-                    </div>
-                </div>
-                <!-- Cột phải: Ghi chú -->
-                <div class="space-y-6 p-4 border border-gray-200 rounded-lg">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-3 text-center">Ghi Chú</h3>
-                     <div>
-                        <label class="font-semibold text-sm">Font chữ</label>
-                        <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-font-selector"></div>
-                    </div>
-                    <div>
-                        <label class="font-semibold text-sm">Kiểu Hiển Thị & Màu Sắc</label>
-                        <div class="flex flex-col space-y-2 choice-selector mt-2" id="note-style-selector"></div>
-                        <div class="grid grid-cols-4 gap-3 choice-selector mt-3" id="note-color-selector"></div>
-                    </div>
-                     <div>
-                        <label class="font-semibold text-sm">Vị trí</label>
-                        <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-position-selector"></div>
-                    </div>
+    <div class="flex flex-col lg:flex-row min-h-screen">
+        <!-- Left Panel: Image Display Area -->
+        <div id="image-panel" class="w-full lg:w-2/3 bg-[#FDF8E1] flex flex-col items-center justify-center p-4 lg:p-8 transition-all duration-300">
+            <!-- Placeholder shown before generation -->
+            <div id="placeholder-view" class="text-center text-amber-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 mx-auto opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h2 class="mt-4 text-2xl font-bold font-display">Tác phẩm của bạn sẽ hiện ở đây</h2>
+                <p class="mt-2 text-amber-700">Hãy tùy chỉnh các thông số bên phải và nhấn "Tạo Hình Ảnh"</p>
+            </div>
+            
+            <!-- Result shown after generation (for Desktop) -->
+            <div id="desktop-result-view" class="w-full max-w-2xl flex-col items-center justify-center space-y-4">
+                <h3 class="text-2xl font-bold text-center font-display text-amber-900">Tác phẩm đã hoàn thành!</h3>
+                <canvas id="resultCanvas" class="w-full h-auto rounded-lg shadow-xl border-4 border-white"></canvas>
+                <div class="flex flex-col sm:flex-row gap-4 w-full">
+                    <a id="downloadBtnDesktop" href="#" download="thiep-anh-phat-giao.png" class="flex-1 text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg">
+                        Tải Về
+                    </a>
+                    <button id="editAgainBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg">
+                        Chỉnh Sửa Lại
+                    </button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- 2. Nhập Nội Dung -->
-        <section>
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Bước 2: Nhập Nội Dung muốn chèn lên ảnh</h2>
-            <div class="space-y-4">
-                <div>
-                    <label for="text1" class="block text-sm font-medium text-gray-700">Nội dung chính</label>
-                    <textarea id="text1" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Đây là phần nội dung Sư Huynh muốn trợ lý chèn lên hình ảnh..."></textarea>
+        <!-- Right Panel: Controls -->
+        <div id="controls-panel" class="w-full lg:w-1/3 bg-white shadow-2xl lg:shadow-none lg:border-l-4 border-yellow-100 p-6 lg:p-8 space-y-6 overflow-y-auto">
+            <header class="text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế 1</h1>
+                <p class="text-amber-600 mt-1">Hỗ trợ các Sư Huynh Hoằng Pháp Lợi Sanh.</p>
+            </header>
+            
+            <!-- Step 1: Content Input -->
+            <section>
+                <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 1: Nhập Nội Dung</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="text1" class="block text-sm font-medium text-amber-800">Nội dung chính</label>
+                        <textarea id="text1" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Đây là phần nội dung Sư Huynh muốn trợ lý chèn lên hình ảnh..."></textarea>
+                    </div>
+                    <div>
+                        <label for="text3" class="block text-sm font-medium text-amber-800">Ghi chú (Nguồn, ngày tháng...)</label>
+                        <input type="text" id="text3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Ví dụ: Lời Phật Dạy, Wenda...">
+                    </div>
                 </div>
-                <div>
-                    <label for="text3" class="block text-sm font-medium text-gray-700">Ghi chú (Nguồn, ngày tháng...)</label>
-                    <input type="text" id="text3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Nguồn bài viết, ví dụ : Wenda...">
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- 3. Tạo ảnh -->
-        <button id="generateBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg text-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-wait" disabled>
-            <span id="btn-text">Đang tải Font chữ...</span>
-        </button>
-    </main>
+            <!-- Step 2: Customization -->
+            <section>
+                <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 2: Tùy Chỉnh</h2>
+                <div class="space-y-4">
+                    <!-- Main Text Accordion -->
+                    <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
+                        <summary class="flex justify-between items-center font-semibold text-amber-900">
+                            Văn Bản Chính
+                            <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </summary>
+                        <div class="mt-4 space-y-5">
+                            <div>
+                                <label class="font-semibold text-sm text-amber-800">Font chữ</label>
+                                <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="main-font-selector"></div>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm text-amber-800">Kiểu & Màu Sắc</label>
+                                <div class="flex flex-col space-y-2 choice-selector mt-2" id="main-style-selector"></div>
+                                <div class="grid grid-cols-4 gap-3 choice-selector mt-3" id="main-color-selector"></div>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm text-amber-800">Vị trí</label>
+                                <div class="flex flex-col space-y-2 choice-selector mt-2" id="main-position-selector"></div>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm text-amber-800">Kích thước</label>
+                                <div class="grid grid-cols-3 gap-2 choice-selector mt-2" id="size-selector"></div>
+                            </div>
+                        </div>
+                    </details>
+                    
+                    <!-- Note Text Accordion -->
+                    <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition">
+                        <summary class="flex justify-between items-center font-semibold text-amber-900">
+                            Ghi Chú
+                            <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </summary>
+                         <div class="mt-4 space-y-5">
+                            <div>
+                                <label class="font-semibold text-sm text-amber-800">Font chữ</label>
+                                <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-font-selector"></div>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-sm text-amber-800">Kiểu & Màu Sắc</label>
+                                <div class="flex flex-col space-y-2 choice-selector mt-2" id="note-style-selector"></div>
+                                <div class="grid grid-cols-4 gap-3 choice-selector mt-3" id="note-color-selector"></div>
+                            </div>
+                             <div>
+                                <label class="font-semibold text-sm text-amber-800">Vị trí</label>
+                                <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-position-selector"></div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Step 3: Generate Button -->
+            <button id="generateBtn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded-lg text-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-400 flex items-center justify-center gap-3 shadow-lg disabled:opacity-60 disabled:cursor-wait disabled:transform-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.789-2.756 9.356-1.747 2.567-4.754 4.144-8.244 4.144V11a11.027 11.027 0 0111 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0-3.517 1.009-6.789 2.756-9.356C16.491-1.033 19.5-2.61 23-2.61V11a11.027 11.027 0 00-11 0z" /></svg>
+                <span id="btn-text">Đang tải Font chữ...</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Loading Modal -->
-    <div id="loading-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 opacity-0 pointer-events-none">
-        <div class="bg-white rounded-lg p-8 text-center space-y-4">
+    <div id="loading-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-lg p-8 text-center space-y-4 shadow-2xl">
             <div class="loader mx-auto"></div>
-            <p class="text-indigo-600 font-semibold text-lg">Đang tạo ảnh cho Sư Huynh...</p>
+            <p class="text-amber-800 font-semibold text-lg">Đang tạo ảnh cho Sư Huynh...</p>
         </div>
     </div>
-
-    <!-- Result Modal -->
-    <div id="result-modal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 opacity-0 pointer-events-none">
-        <div class="bg-white rounded-lg p-6 space-y-4 w-full max-w-lg">
-            <h3 class="text-2xl font-bold text-center text-indigo-600">Tác phẩm đã hoàn thành!</h3>
-            <canvas id="resultCanvas" class="w-full h-auto rounded-lg shadow-md"></canvas>
+    
+    <!-- Result Modal (for Mobile) -->
+    <div id="result-modal-mobile" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden">
+        <div class="bg-white rounded-lg p-4 space-y-4 w-full max-w-lg">
+            <h3 class="text-2xl font-bold text-center text-amber-800 font-display">Tác phẩm đã hoàn thành!</h3>
+            <canvas id="resultCanvasMobile" class="w-full h-auto rounded-lg shadow-md"></canvas>
             <div class="flex flex-col sm:flex-row gap-4">
-                <a id="downloadBtn" href="#" download="thiep-anh.png" class="flex-1 text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition">Tải Về</a>
-                <button id="closeBtn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition">Đóng</button>
+                <a id="downloadBtnMobile" href="#" download="thiep-anh-phat-giao.png" class="flex-1 text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition">Tải Về</a>
+                <button id="closeBtnMobile" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition">Đóng</button>
             </div>
         </div>
     </div>
 
+
     <script type="module">
-        // --- CÁC PHẦN TỬ DOM ---
+        // --- DOM ELEMENTS ---
         const generateBtn = document.getElementById('generateBtn');
         const btnText = document.getElementById('btn-text');
         const mainFontSelectorContainer = document.getElementById('main-font-selector');
@@ -143,13 +227,24 @@
         const textInputs = { text1: document.getElementById('text1'), text3: document.getElementById('text3') };
         
         const loadingModal = document.getElementById('loading-modal');
-        const resultModal = document.getElementById('result-modal');
-        const closeBtn = document.getElementById('closeBtn');
-        const canvas = document.getElementById('resultCanvas');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const ctx = canvas.getContext('2d');
+        
+        // Desktop result view elements
+        const desktopResultView = document.getElementById('desktop-result-view');
+        const canvasDesktop = document.getElementById('resultCanvas');
+        const downloadBtnDesktop = document.getElementById('downloadBtnDesktop');
+        const editAgainBtn = document.getElementById('editAgainBtn');
+        const placeholderView = document.getElementById('placeholder-view');
 
-        // --- ĐỊNH NGHĨA CÁC BỘ FONT, MÀU, VỊ TRÍ, KÍCH THƯỚC ---
+        // Mobile result modal elements
+        const resultModalMobile = document.getElementById('result-modal-mobile');
+        const canvasMobile = document.getElementById('resultCanvasMobile');
+        const downloadBtnMobile = document.getElementById('downloadBtnMobile');
+        const closeBtnMobile = document.getElementById('closeBtnMobile');
+
+        const ctxDesktop = canvasDesktop.getContext('2d');
+        const ctxMobile = canvasMobile.getContext('2d');
+
+        // --- DEFINITIONS (Fonts, Styles, etc.) ---
         const fontProfiles = [
             { id: 'font1', name: 'Roboto', main: "'Roboto', sans-serif" },
             { id: 'font2', name: 'Be Vietnam Pro', main: "'Be Vietnam Pro', sans-serif" },
@@ -158,18 +253,18 @@
             { id: 'font5', name: 'Arial', main: "Arial, sans-serif" },
         ];
         const styleProfiles = [
-            { id: 'styleBox', name: 'Hộp Nền Tối', method: 'drawTextBox', boxColor: 'rgba(40, 26, 1, 0.8)' },
+            { id: 'styleBox', name: 'Hộp Nền Tối', method: 'drawTextBox', boxColor: 'rgba(66, 32, 6, 0.8)' }, // Nâu đậm
             { id: 'styleGlow', name: 'Chữ Nổi Bật', method: 'drawGlowedText' },
         ];
         const boxTextColors = [
-            { name: 'Trắng', value: '#FFFFFF' }, { name: 'Vàng Nhạt', value: '#FEFCE8' },
-            { name: 'Hồng Sáng', value: '#FCE7F3' }, { name: 'Xanh Sáng', value: '#ECFEFF' },
+            { name: 'Trắng', value: '#FFFFFF' }, { name: 'Vàng Kem', value: '#FFFBEB' },
+            { name: 'Vàng Nhạt', value: '#FEF9C3' }, { name: 'Nâu Sáng', value: '#FDE68A' },
         ];
         const glowTextColors = [
-            { name: 'Trắng', value: '#FFFFFF', outline: '#000000' }, { name: 'Đen', value: '#111827', outline: '#F3F4F6' },
-            { name: 'Vàng Kim', value: '#FBBF24', outline: '#422006' }, { name: 'Hồng Phấn', value: '#FBCFE8', outline: '#831843' },
-            { name: 'Xanh Trời', value: '#A5F3FC', outline: '#0E7490' }, { name: 'Xanh Lá', value: '#BEF264', outline: '#365314' },
-            { name: 'Tím', value: '#D8B4FE', outline: '#581C87' }, { name: 'Cam', value: '#FDBA74', outline: '#7C2D12' },
+            { name: 'Trắng', value: '#FFFFFF', outline: '#422006' }, { name: 'Đen', value: '#1C1917', outline: '#FDE68A' },
+            { name: 'Vàng Kim', value: '#FBBF24', outline: '#422006' }, { name: 'Nâu Đậm', value: '#422006', outline: '#FFFFFF' },
+            { name: 'Trắng Kem', value: '#FFFBEB', outline: '#78350F' }, { name: 'Vàng Cam', value: '#F59E0B', outline: '#422006' },
+            { name: 'Đỏ Nâu', value: '#9A3412', outline: '#FFFFFF' }, { name: 'Xanh Rêu', value: '#57534E', outline: '#FDE68A' },
         ];
         const mainPositionProfiles = [
             { id: 'posTop', name: 'Ở Trên', value: 'top' },
@@ -188,7 +283,7 @@
             { id: 'size70', name: '70px', value: 70 },
         ];
         
-        // --- KHỞI TẠO GIAO DIỆN & TẢI FONT ---
+        // --- INITIALIZATION ---
         async function loadFonts() {
             const fontChecks = fontProfiles.map(p => document.fonts.load(`700 12px ${p.main}`));
             try {
@@ -203,23 +298,21 @@
         }
 
         function initializeUI() {
-            // Font Selectors
             const createFontSelector = (container, name, defaultIndex) => {
-                container.innerHTML = ''; // Clear previous options
+                container.innerHTML = '';
                 fontProfiles.forEach((profile, index) => {
                     container.innerHTML += `
                         <div>
                             <input type="radio" name="${name}" id="${name}-${profile.id}" value="${profile.id}" class="hidden" ${index === defaultIndex ? 'checked' : ''}>
-                            <label for="${name}-${profile.id}" class="block cursor-pointer border-2 border-gray-200 rounded-lg p-2 text-center transition hover:border-indigo-500 h-full">
-                                <div style="font-family: ${profile.main}; font-size: 1.2rem; line-height: 1.2;">${profile.name}</div>
+                            <label for="${name}-${profile.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full">
+                                <div style="font-family: ${profile.main}; font-size: 1.1rem; line-height: 1.2;">${profile.name}</div>
                             </label>
                         </div>`;
                 });
             };
-            createFontSelector(mainFontSelectorContainer, 'main-font', 0);
-            createFontSelector(noteFontSelectorContainer, 'note-font', 3);
+            createFontSelector(mainFontSelectorContainer, 'main-font', 1); // Be Vietnam Pro default
+            createFontSelector(noteFontSelectorContainer, 'note-font', 0); // Roboto default for note
 
-            // Style & Color Selectors
             const createStyleAndColorSelectors = (styleContainer, colorContainer, namePrefix, defaultIndex) => {
                 const populateColors = (styleId) => {
                     colorContainer.innerHTML = '';
@@ -236,16 +329,14 @@
                 };
 
                 styleContainer.addEventListener('change', (e) => {
-                    if (e.target.name === `${namePrefix}-style`) {
-                        populateColors(e.target.value);
-                    }
+                    if (e.target.name === `${namePrefix}-style`) populateColors(e.target.value);
                 });
 
                 styleProfiles.forEach((style, index) => {
                     styleContainer.innerHTML += `
                         <div>
                             <input type="radio" name="${namePrefix}-style" id="${namePrefix}-${style.id}" value="${style.id}" class="hidden" ${index === defaultIndex ? 'checked' : ''}>
-                            <label for="${namePrefix}-${style.id}" class="block cursor-pointer border-2 border-gray-200 rounded-lg p-2 text-center transition hover:border-indigo-500 font-medium">${style.name}</label>
+                            <label for="${namePrefix}-${style.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${style.name}</label>
                         </div>`;
                 });
                 populateColors(styleProfiles[defaultIndex].id);
@@ -254,28 +345,25 @@
             createStyleAndColorSelectors(mainStyleSelectorContainer, mainColorSelectorContainer, 'main', 0);
             createStyleAndColorSelectors(noteStyleSelectorContainer, noteColorSelectorContainer, 'note', 1);
 
-            // Size Selector
             sizeProfiles.forEach((size, index) => {
                 sizeSelectorContainer.innerHTML += `
                     <div>
                         <input type="radio" name="size" id="${size.id}" value="${size.value}" class="hidden" ${index === 2 ? 'checked' : ''}>
-                        <label for="${size.id}" class="block cursor-pointer border-2 border-gray-200 rounded-lg p-2 text-center transition hover:border-indigo-500 font-medium">${size.name}</label>
+                        <label for="${size.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${size.name}</label>
                     </div>`;
             });
-            // Main Position Selector
             mainPositionProfiles.forEach((pos, index) => {
                 mainPositionSelectorContainer.innerHTML += `
                     <div>
                         <input type="radio" name="main_position" id="${pos.id}" value="${pos.value}" class="hidden" ${index === 1 ? 'checked' : ''}>
-                        <label for="${pos.id}" class="block cursor-pointer border-2 border-gray-200 rounded-lg p-2 text-center transition hover:border-indigo-500 font-medium">${pos.name}</label>
+                        <label for="${pos.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${pos.name}</label>
                     </div>`;
             });
-            // Note Position Selector
             notePositionProfiles.forEach((pos, index) => {
                 notePositionSelectorContainer.innerHTML += `
                     <div>
-                        <input type="radio" name="note_position" id="${pos.id}" value="${pos.value}" class="hidden" ${index === 0 ? 'checked' : ''}>
-                        <label for="${pos.id}" class="block cursor-pointer border-2 border-gray-200 rounded-lg p-2 text-center transition hover:border-indigo-500 font-medium">${pos.name}</label>
+                        <input type="radio" name="note_position" id="${pos.id}" value="${pos.value}" class="hidden" ${index === 3 ? 'checked' : ''}>
+                        <label for="${pos.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${pos.name}</label>
                     </div>`;
             });
             
@@ -284,7 +372,7 @@
 
         initializeUI();
 
-        // --- HÀM CHÍNH ---
+        // --- CORE LOGIC ---
         generateBtn.addEventListener('click', async () => {
             const options = {
                 main: {
@@ -302,15 +390,34 @@
                 }
             };
             const texts = { text1: textInputs.text1.value, text3: textInputs.text3.value.trim() };
-            if (!texts.text1 && !texts.text3) { alert("Bạn chưa nhập nội dung nào cả!"); return; }
+            if (!texts.text1 && !texts.text3) { 
+                alert("Bạn chưa nhập nội dung nào cả!"); 
+                return; 
+            }
 
             showModal(loadingModal);
             try {
                 const prompt = generateLotusPrompt(); 
                 const imageDataURL = await queryStabilityAPI(prompt);
-                await drawImageWithLayout(imageDataURL, options, texts);
+                
+                // Draw on both canvases
+                await drawImageWithLayout(ctxDesktop, canvasDesktop, imageDataURL, options, texts);
+                await drawImageWithLayout(ctxMobile, canvasMobile, imageDataURL, options, texts);
+
+                // Update download links
+                const finalImageURL = canvasDesktop.toDataURL('image/png');
+                downloadBtnDesktop.href = finalImageURL;
+                downloadBtnMobile.href = finalImageURL;
+
                 hideModal(loadingModal);
-                showModal(resultModal);
+
+                // Show result based on screen size
+                if (window.innerWidth >= 1024) { // lg breakpoint in Tailwind
+                    document.body.classList.add('results-shown-desktop');
+                } else {
+                    showModal(resultModalMobile);
+                }
+
             } catch (error) {
                 hideModal(loadingModal);
                 alert(`Đã có lỗi xảy ra: ${error.message}`);
@@ -318,12 +425,17 @@
             }
         });
 
-        closeBtn.addEventListener('click', () => hideModal(resultModal));
+        // --- EVENT LISTENERS FOR CLOSING/EDITING ---
+        closeBtnMobile.addEventListener('click', () => hideModal(resultModalMobile));
+        editAgainBtn.addEventListener('click', () => {
+             document.body.classList.remove('results-shown-desktop');
+        });
 
-        // --- HỆ THỐNG BỐ CỤC ĐỘNG ---
-        async function drawImageWithLayout(imageDataURL, options, texts) {
+        // --- DRAWING SYSTEM ---
+        async function drawImageWithLayout(ctx, canvas, imageDataURL, options, texts) {
             return new Promise((resolve, reject) => {
                 const image = new Image();
+                image.crossOrigin = "anonymous"; // Important for tainted canvas
                 image.src = imageDataURL;
                 image.onload = () => {
                     const size = Math.min(image.width, image.height);
@@ -338,35 +450,16 @@
                     const noteFontProfile = fontProfiles.find(f => f.id === options.note.fontId);
                     const noteStyleProfile = styleProfiles.find(s => s.id === options.note.styleId);
 
-                    // Vẽ ghi chú (text3)
                     if (texts.text3) {
-                        const noteBlock = {
-                            size: 22,
-                            font: noteFontProfile.main,
-                            color: options.note.color.value,
-                            boxColor: noteStyleProfile.boxColor,
-                            outlineColor: options.note.color.outline,
-                            position: options.note.position
-                        };
-                        const preparedNote = prepareTextBlock(ctx, texts.text3, noteBlock);
-                        preparedNote.drawCall(noteStyleProfile.method);
+                        const noteBlock = { size: 22, font: noteFontProfile.main, color: options.note.color.value, boxColor: noteStyleProfile.boxColor, outlineColor: options.note.color.outline, position: options.note.position };
+                        prepareTextBlock(ctx, texts.text3, noteBlock).drawCall(noteStyleProfile.method);
                     }
 
-                    // Vẽ nội dung chính (text1)
                     if (texts.text1) {
-                        const mainBlock = {
-                            size: options.main.size,
-                            font: mainFontProfile.main,
-                            color: options.main.color.value,
-                            boxColor: mainStyleProfile.boxColor,
-                            outlineColor: options.main.color.outline,
-                            position: options.main.position
-                        };
-                        const preparedMain = prepareTextBlock(ctx, texts.text1, mainBlock);
-                        preparedMain.drawCall(mainStyleProfile.method);
+                        const mainBlock = { size: options.main.size, font: mainFontProfile.main, color: options.main.color.value, boxColor: mainStyleProfile.boxColor, outlineColor: options.main.color.outline, position: options.main.position };
+                        prepareTextBlock(ctx, texts.text1, mainBlock).drawCall(mainStyleProfile.method);
                     }
-
-                    downloadBtn.href = canvas.toDataURL('image/png');
+                    
                     URL.revokeObjectURL(image.src);
                     resolve();
                 };
@@ -416,16 +509,14 @@
             };
         }
 
-        // --- CÁC HÀM VẼ CHI TIẾT ---
+        // --- DRAWING HELPERS ---
         function drawTextBox(ctx, lines, x, startY, lineHeight, fontSize, block) {
             const padding = fontSize * 0.4;
             lines.forEach((line, index) => {
                 const textMetrics = ctx.measureText(line);
                 const lineWidth = textMetrics.width;
-                
                 const bannerWidth = lineWidth + padding * 2;
                 const bannerHeight = fontSize + padding;
-                
                 const currentLineY = startY + (index * lineHeight);
                 const bannerX = x - (ctx.textAlign === 'center' ? bannerWidth / 2 : (ctx.textAlign === 'right' ? bannerWidth : 0));
                 
@@ -454,15 +545,13 @@
             ctx.shadowColor = 'transparent';
         }
 
-        // --- CÁC HÀM PHỤ ---
+        // --- UTILITY FUNCTIONS ---
         function wrapText(ctx, text, maxWidth) {
             const finalLines = [];
             const initialLines = text.split('\n'); 
-
             initialLines.forEach(line => {
                 const words = line.split(' ');
                 let currentLine = words[0] || '';
-
                 for (let i = 1; i < words.length; i++) {
                     const word = words[i];
                     const testLine = currentLine + " " + word;
@@ -485,33 +574,17 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
         }
 
-        function setupLoadingUI() {
-            showModal(loadingModal);
-            generateBtn.disabled = true;
-            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
-        }
-
-        function showResultUI() {
-            hideModal(loadingModal);
-            showModal(resultModal);
-        }
-
         function generateLotusPrompt() {
-            const base = "masterpiece, best quality, beautiful anime style illustration of a lotus flower, scenic, soft lighting, clean lines, square image";
-            const styles = ["on a serene pond at sunrise", "in a mystical garden with cinematic light", "minimalist, clean lines, vibrant colors", "with a traditional asian temple in the background"];
+            const base = "masterpiece, best quality, beautiful anime style illustration of a lotus flower, scenic, soft lighting, clean lines, square image, buddhist theme, serene, spiritual";
+            const styles = ["on a serene pond at sunrise with mist", "in a mystical zen garden with cinematic light", "minimalist, clean lines, vibrant gold and brown colors", "with a traditional asian temple in the background fog", "glowing softly in a dark, peaceful environment"];
             return `${base}, ${styles[Math.floor(Math.random() * styles.length)]}`;
         }
 
-        // --- MODIFIED FUNCTION ---
-        // This function now calls our own backend proxy server
         async function queryStabilityAPI(prompt) {
-            // The API call is now directed to our own server endpoint
             const response = await fetch(`/api/generate-image`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ prompt: prompt }), // Send the prompt in the body
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt }),
             });
 
             if (!response.ok) {
