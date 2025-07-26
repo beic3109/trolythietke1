@@ -36,7 +36,7 @@ app.post('/api/generate-image', async (req, res) => {
         return res.status(500).json({ error: 'API key is not configured on the server.' });
     }
 
-    const engineId = 'stable-diffusion-v1-6';
+    const engineId = 'stable-diffusion-v1-5';
     const apiHost = 'https://api.stability.ai';
 
     try {
