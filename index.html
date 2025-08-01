@@ -3,560 +3,600 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trợ Lý Thiết Kế - Hoằng Pháp Lợi Sanh</title>
+    <title>Trợ Lý Thiết Kế V2 - Hoằng Pháp Lợi Sanh</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Be+Vietnam+Pro:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        /* --- General Styling --- */
+        :root {
+            --mau-nen: #FDF8E1;
+            --mau-chu-dam: #422006;
+            --mau-nau-dam: #8C5A2B;
+            --mau-vang-cam: #D97706;
+        }
         body { 
             font-family: 'Be Vietnam Pro', sans-serif; 
-            background-color: #FDF8E1; /* Màu nền vàng kem */
-            color: #422006; /* Màu chữ nâu đậm */
+            background-color: var(--mau-nen);
+            color: var(--mau-chu-dam);
         }
-        
-        /* --- Font Styles --- */
         .font-display { font-family: 'Playfair Display', serif; }
-        .font-body { font-family: 'Be Vietnam Pro', sans-serif; }
-
-        /* --- Loader Animation --- */
-        .loader { 
-            border: 5px solid #D1C4A8; /* Màu nâu nhạt */
-            border-top: 5px solid #8C5A2B; /* Màu nâu đậm */
-            border-radius: 50%; 
-            width: 60px; 
-            height: 60px; 
-            animation: spin 1.5s linear infinite; 
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-
-        /* --- Custom UI Component Styling --- */
-        .choice-selector input:checked + label {
-            border-color: #D97706; /* Vàng cam */
-            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.3);
-            background-color: #FEF3C7; /* Vàng rất nhạt */
-        }
-        .color-swatch {
-            width: 1.75rem; height: 1.75rem;
-            border-radius: 9999px;
-            border: 2px solid rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .choice-selector input:checked + label .color-swatch {
-            transform: scale(1.25);
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-        }
         
-        /* --- Accordion (Details/Summary) Styling --- */
-        details > summary {
-            list-style: none;
-            cursor: pointer;
-        }
-        details > summary::-webkit-details-marker {
-            display: none;
-        }
-        details .accordion-icon {
-            transition: transform 0.3s ease;
-        }
-        details[open] .accordion-icon {
-            transform: rotate(90deg);
+        /* --- General Component Styling --- */
+        .control-panel-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* --- Responsive Layout Control --- */
-        /* Hide desktop result view on small screens */
-        #desktop-result-view { display: none; }
-        /* When results are shown on desktop, hide the placeholder */
-        body.results-shown-desktop #desktop-result-view { display: flex; }
-        body.results-shown-desktop #placeholder-view { display: none; }
+        /* --- Layout Template Selector --- */
+        .layout-selector input:checked + label {
+            border-color: var(--mau-vang-cam);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
+            background-color: #FFFBEB;
+        }
+        .layout-preview-box {
+            aspect-ratio: 1 / 1;
+            border: 2px dashed #D1C4A8;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .layout-preview-box > div {
+            background-color: #D1C4A8;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 4px;
+            text-align: center;
+        }
+        .layout-preview-box .logo-placeholder {
+            background-color: #A5B4FC;
+            width: 20%;
+            padding: 4px 0;
+        }
+        .layout-preview-box .note-placeholder {
+            background-color: #F87171;
+            width: 40%;
+        }
+        .layout-preview-box .text-placeholder {
+            background-color: #60A5FA;
+            width: 80%;
+            padding: 8px 0;
+        }
+
+        /* --- Mobile Toolbar & Panels --- */
+        #mobile-toolbar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .mobile-panel {
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
+            visibility: hidden;
+        }
+        .mobile-panel.is-open {
+            transform: translateY(0);
+            visibility: visible;
+        }
+        #mobile-toolbar button.active {
+            color: var(--mau-vang-cam);
+            background-color: #FFFBEB;
+        }
+
+        /* --- Accordion Styling --- */
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details .accordion-icon { transition: transform 0.3s ease; }
+        details[open] .accordion-icon { transform: rotate(90deg); }
 
     </style>
 </head>
-<body class="font-body">
+<body class="overflow-x-hidden">
 
     <div class="flex flex-col lg:flex-row min-h-screen">
-        <!-- Left Panel: Image Display Area -->
-        <div id="image-panel" class="w-full lg:w-2/3 bg-[#FDF8E1] flex flex-col items-center justify-center p-4 lg:p-8 transition-all duration-300">
-            <!-- Placeholder shown before generation -->
-            <div id="placeholder-view" class="text-center text-amber-800">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 mx-auto opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h2 class="mt-4 text-2xl font-bold font-display">Tác phẩm của bạn sẽ hiện ở đây</h2>
-                <p class="mt-2 text-amber-700">Hãy tùy chỉnh các thông số bên phải và nhấn "Tạo Hình Ảnh"</p>
-            </div>
-            
-            <!-- Result shown after generation (for Desktop) -->
-            <div id="desktop-result-view" class="w-full max-w-2xl flex-col items-center justify-center space-y-4">
-                <h3 class="text-2xl font-bold text-center font-display text-amber-900">Tác phẩm đã hoàn thành!</h3>
-                <canvas id="resultCanvas" class="w-full h-auto rounded-lg shadow-xl border-4 border-white"></canvas>
-                <div class="flex flex-col sm:flex-row gap-4 w-full">
-                    <a id="downloadBtnDesktop" href="#" download="thiep-anh-phat-giao.png" class="flex-1 text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg">
-                        Tải Về
-                    </a>
-                    <button id="editAgainBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition shadow-md hover:shadow-lg">
-                        Chỉnh Sửa Lại
-                    </button>
-                </div>
+        <!-- Left/Main Panel: Image Display Area -->
+        <div id="image-panel" class="w-full lg:w-2/3 bg-gray-200 flex items-center justify-center p-4 lg:p-8">
+            <div id="canvas-container" class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
+                <canvas id="resultCanvas" class="w-full h-auto rounded-lg"></canvas>
             </div>
         </div>
 
-        <!-- Right Panel: Controls -->
-        <div id="controls-panel" class="w-full lg:w-1/3 bg-white shadow-2xl lg:shadow-none lg:border-l-4 border-yellow-100 p-6 lg:p-8 space-y-6 overflow-y-auto">
-            <header class="text-center">
-                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế 1</h1>
-                <p class="text-amber-600 mt-1">Hỗ trợ các Sư Huynh Hoằng Pháp Lợi Sanh.</p>
+        <!-- Right Panel: Desktop Controls -->
+        <div id="controls-panel" class="hidden lg:block w-full lg:w-1/3 bg-white border-l-4 border-yellow-100 p-8 space-y-6 overflow-y-auto">
+            <header class="text-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V2</h1>
+                <p class="text-amber-600 mt-1">Giao diện mới, trải nghiệm mới.</p>
             </header>
             
-            <!-- Step 1: Content Input -->
-            <section>
-                <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 1: Nhập Nội Dung</h2>
-                <div class="space-y-4">
-                    <div>
-                        <label for="text1" class="block text-sm font-medium text-amber-800">Nội dung chính</label>
-                        <textarea id="text1" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Đây là phần nội dung Sư Huynh muốn trợ lý chèn lên hình ảnh..."></textarea>
-                    </div>
-                    <div>
-                        <label for="text3" class="block text-sm font-medium text-amber-800">Ghi chú (Nguồn, ngày tháng...)</label>
-                        <input type="text" id="text3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Ví dụ: Lời Phật Dạy, Wenda...">
-                    </div>
-                </div>
-            </section>
+            <div id="desktop-controls-content">
+                <!-- Content will be cloned here from mobile panels -->
+            </div>
+             <a id="downloadBtn" href="#" download="thiep-anh-phat-giao.png" class="mt-6 w-full text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                Tải Về Hình Ảnh
+            </a>
+        </div>
+    </div>
 
-            <!-- Step 2: Customization -->
-            <section>
-                <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 2: Tùy Chỉnh</h2>
-                <div class="space-y-4">
-                    <!-- Main Text Accordion -->
-                    <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
-                        <summary class="flex justify-between items-center font-semibold text-amber-900">
-                            Văn Bản Chính
-                            <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                        </summary>
-                        <div class="mt-4 space-y-5">
-                            <div>
-                                <label class="font-semibold text-sm text-amber-800">Font chữ</label>
-                                <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="main-font-selector"></div>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-sm text-amber-800">Kiểu & Màu Sắc</label>
-                                <div class="flex flex-col space-y-2 choice-selector mt-2" id="main-style-selector"></div>
-                                <div class="grid grid-cols-4 gap-3 choice-selector mt-3" id="main-color-selector"></div>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-sm text-amber-800">Vị trí</label>
-                                <div class="flex flex-col space-y-2 choice-selector mt-2" id="main-position-selector"></div>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-sm text-amber-800">Kích thước</label>
-                                <div class="grid grid-cols-3 gap-2 choice-selector mt-2" id="size-selector"></div>
-                            </div>
-                        </div>
-                    </details>
-                    
-                    <!-- Note Text Accordion -->
-                    <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition">
-                        <summary class="flex justify-between items-center font-semibold text-amber-900">
-                            Ghi Chú
-                            <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                        </summary>
-                         <div class="mt-4 space-y-5">
-                            <div>
-                                <label class="font-semibold text-sm text-amber-800">Font chữ</label>
-                                <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-font-selector"></div>
-                            </div>
-                            <div>
-                                <label class="font-semibold text-sm text-amber-800">Kiểu & Màu Sắc</label>
-                                <div class="flex flex-col space-y-2 choice-selector mt-2" id="note-style-selector"></div>
-                                <div class="grid grid-cols-4 gap-3 choice-selector mt-3" id="note-color-selector"></div>
-                            </div>
-                             <div>
-                                <label class="font-semibold text-sm text-amber-800">Vị trí</label>
-                                <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-position-selector"></div>
-                            </div>
-                        </div>
-                    </details>
-                </div>
-            </section>
+    <!-- Mobile UI Elements -->
+    <div class="lg:hidden">
+        <!-- Mobile Panels (Slide-up menus) -->
+        <div id="panels-container" class="fixed inset-0 bg-black bg-opacity-30 z-40" style="visibility: hidden;"></div>
 
-            <!-- Step 3: Generate Button -->
-            <button id="generateBtn" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded-lg text-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-400 flex items-center justify-center gap-3 shadow-lg disabled:opacity-60 disabled:cursor-wait disabled:transform-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.789-2.756 9.356-1.747 2.567-4.754 4.144-8.244 4.144V11a11.027 11.027 0 0111 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0-3.517 1.009-6.789 2.756-9.356C16.491-1.033 19.5-2.61 23-2.61V11a11.027 11.027 0 00-11 0z" /></svg>
-                <span id="btn-text">Đang tải Font chữ...</span>
+        <div id="layout-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
+            <h3 class="font-bold text-lg mb-4 text-center">Chọn Bố Cục</h3>
+            <section id="layout-controls" class="control-panel-section bg-amber-50">
+                <!-- Layout content will be injected here -->
+            </section>
+        </div>
+
+        <div id="text-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
+             <h3 class="font-bold text-lg mb-4 text-center">Nhập Nội Dung</h3>
+            <section id="text-controls" class="control-panel-section bg-amber-50">
+                <!-- Text content will be injected here -->
+            </section>
+        </div>
+
+        <div id="style-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50 overflow-y-auto" style="max-height: 80vh;">
+             <h3 class="font-bold text-lg mb-4 text-center">Tùy Chỉnh Font &amp; Màu</h3>
+            <section id="style-controls" class="space-y-4">
+                <!-- Style content will be injected here -->
+            </section>
+        </div>
+
+        <!-- Mobile Toolbar -->
+        <div id="mobile-toolbar" class="fixed bottom-0 left-0 right-0 bg-white h-20 border-t shadow-lg flex justify-around items-center z-50">
+            <button data-panel="layout-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" /></svg>
+                <span class="text-xs mt-1">Bố Cục</span>
+            </button>
+            <button data-panel="text-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                <span class="text-xs mt-1">Nội Dung</span>
+            </button>
+            <button data-panel="style-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+                <span class="text-xs mt-1">Kiểu Chữ</span>
             </button>
         </div>
     </div>
-
-    <!-- Loading Modal -->
-    <div id="loading-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-white rounded-lg p-8 text-center space-y-4 shadow-2xl">
-            <div class="loader mx-auto"></div>
-            <p class="text-amber-800 font-semibold text-lg">Đang tạo ảnh cho Sư Huynh...</p>
-        </div>
-    </div>
     
-    <!-- Result Modal (for Mobile) -->
-    <div id="result-modal-mobile" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden">
-        <div class="bg-white rounded-lg p-4 space-y-4 w-full max-w-lg">
-            <h3 class="text-2xl font-bold text-center text-amber-800 font-display">Tác phẩm đã hoàn thành!</h3>
-            <canvas id="resultCanvasMobile" class="w-full h-auto rounded-lg shadow-md"></canvas>
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a id="downloadBtnMobile" href="#" download="thiep-anh-phat-giao.png" class="flex-1 text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition">Tải Về</a>
-                <button id="closeBtnMobile" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg transition">Đóng</button>
+    <!-- Templates for cloning -->
+    <div id="templates" class="hidden">
+         <div id="template-layout-controls">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Chọn Bố Cục</h2>
+            <div class="grid grid-cols-3 gap-3 layout-selector" id="layout-selector">
+                <!-- Layout options will be generated here -->
             </div>
+        </div>
+        <div id="template-text-controls">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Nhập Nội Dung</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="text1" class="block text-sm font-medium text-amber-800">Nội dung chính</label>
+                    <textarea id="text1" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Đây là phần nội dung Sư Huynh muốn chèn lên hình ảnh..."></textarea>
+                </div>
+                <div>
+                    <label for="text3" class="block text-sm font-medium text-amber-800">Ghi chú (Nguồn, ngày tháng...)</label>
+                    <input type="text" id="text3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Ví dụ: Lời Phật Dạy, Wenda...">
+                </div>
+            </div>
+        </div>
+        <div id="template-style-controls">
+             <h2 class="text-xl font-bold text-amber-900 mb-3">Tùy Chỉnh</h2>
+             <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
+                <summary class="flex justify-between items-center font-semibold text-amber-900">
+                    Văn Bản Chính
+                    <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </summary>
+                <div class="mt-4 space-y-5">
+                    <div>
+                        <label class="font-semibold text-sm text-amber-800">Font chữ</label>
+                        <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="main-font-selector"></div>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
+                        <div class="grid grid-cols-5 gap-2 choice-selector mt-3" id="main-color-selector"></div>
+                    </div>
+                </div>
+            </details>
+            <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition">
+                <summary class="flex justify-between items-center font-semibold text-amber-900">
+                    Ghi Chú
+                    <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </summary>
+                 <div class="mt-4 space-y-5">
+                    <div>
+                        <label class="font-semibold text-sm text-amber-800">Font chữ</label>
+                        <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-font-selector"></div>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
+                        <div class="grid grid-cols-5 gap-2 choice-selector mt-3" id="note-color-selector"></div>
+                    </div>
+                </div>
+            </details>
         </div>
     </div>
 
 
     <script type="module">
-        // --- DOM ELEMENTS ---
-        const generateBtn = document.getElementById('generateBtn');
-        const btnText = document.getElementById('btn-text');
-        const mainFontSelectorContainer = document.getElementById('main-font-selector');
-        const noteFontSelectorContainer = document.getElementById('note-font-selector');
-        const mainStyleSelectorContainer = document.getElementById('main-style-selector');
-        const noteStyleSelectorContainer = document.getElementById('note-style-selector');
-        const sizeSelectorContainer = document.getElementById('size-selector');
-        const mainPositionSelectorContainer = document.getElementById('main-position-selector');
-        const notePositionSelectorContainer = document.getElementById('note-position-selector');
-        const mainColorSelectorContainer = document.getElementById('main-color-selector');
-        const noteColorSelectorContainer = document.getElementById('note-color-selector');
-        const textInputs = { text1: document.getElementById('text1'), text3: document.getElementById('text3') };
-        
-        const loadingModal = document.getElementById('loading-modal');
-        
-        // Desktop result view elements
-        const desktopResultView = document.getElementById('desktop-result-view');
-        const canvasDesktop = document.getElementById('resultCanvas');
-        const downloadBtnDesktop = document.getElementById('downloadBtnDesktop');
-        const editAgainBtn = document.getElementById('editAgainBtn');
-        const placeholderView = document.getElementById('placeholder-view');
-
-        // Mobile result modal elements
-        const resultModalMobile = document.getElementById('result-modal-mobile');
-        const canvasMobile = document.getElementById('resultCanvasMobile');
-        const downloadBtnMobile = document.getElementById('downloadBtnMobile');
-        const closeBtnMobile = document.getElementById('closeBtnMobile');
-
-        const ctxDesktop = canvasDesktop.getContext('2d');
-        const ctxMobile = canvasMobile.getContext('2d');
-
-        // --- DEFINITIONS (Fonts, Styles, etc.) ---
-        const fontProfiles = [
-            { id: 'font1', name: 'Roboto', main: "'Roboto', sans-serif" },
-            { id: 'font2', name: 'Be Vietnam Pro', main: "'Be Vietnam Pro', sans-serif" },
-            { id: 'font3', name: 'Playfair Display', main: "'Playfair Display', serif" },
-            { id: 'font4', name: 'Times New Roman', main: "'Times New Roman', serif" },
-            { id: 'font5', name: 'Arial', main: "Arial, sans-serif" },
-        ];
-        const styleProfiles = [
-            { id: 'styleBox', name: 'Hộp Nền Tối', method: 'drawTextBox', boxColor: 'rgba(66, 32, 6, 0.8)' }, // Nâu đậm
-            { id: 'styleGlow', name: 'Chữ Nổi Bật', method: 'drawGlowedText' },
-        ];
-        const boxTextColors = [
-            { name: 'Trắng', value: '#FFFFFF' }, { name: 'Vàng Kem', value: '#FFFBEB' },
-            { name: 'Vàng Nhạt', value: '#FEF9C3' }, { name: 'Nâu Sáng', value: '#FDE68A' },
-        ];
-        const glowTextColors = [
-            { name: 'Trắng', value: '#FFFFFF', outline: '#422006' }, { name: 'Đen', value: '#1C1917', outline: '#FDE68A' },
-            { name: 'Vàng Kim', value: '#FBBF24', outline: '#422006' }, { name: 'Nâu Đậm', value: '#422006', outline: '#FFFFFF' },
-            { name: 'Trắng Kem', value: '#FFFBEB', outline: '#78350F' }, { name: 'Vàng Cam', value: '#F59E0B', outline: '#422006' },
-            { name: 'Đỏ Nâu', value: '#9A3412', outline: '#FFFFFF' }, { name: 'Xanh Rêu', value: '#57534E', outline: '#FDE68A' },
-        ];
-        const mainPositionProfiles = [
-            { id: 'posTop', name: 'Ở Trên', value: 'top' },
-            { id: 'posCenter', name: 'Ở Giữa', value: 'center' },
-            { id: 'posBottom', name: 'Ở Dưới', value: 'bottom' },
-        ];
-        const notePositionProfiles = [
-            { id: 'noteTopLeft', name: 'Trên Trái', value: 'topLeft' },
-            { id: 'noteTopRight', name: 'Trên Phải', value: 'topRight' },
-            { id: 'noteBottomLeft', name: 'Dưới Trái', value: 'bottomLeft' },
-            { id: 'noteBottomRight', name: 'Dưới Phải', value: 'bottomRight' },
-        ];
-        const sizeProfiles = [
-            { id: 'size30', name: '30px', value: 30 }, { id: 'size40', name: '40px', value: 40 },
-            { id: 'size50', name: '50px', value: 50 }, { id: 'size60', name: '60px', value: 60 },
-            { id: 'size70', name: '70px', value: 70 },
-        ];
-        
-        // --- INITIALIZATION ---
-        async function loadFonts() {
-            const fontChecks = fontProfiles.map(p => document.fonts.load(`700 12px ${p.main}`));
-            try {
-                await Promise.all(fontChecks);
-                console.log("Tất cả font đã được tải thành công!");
-                generateBtn.disabled = false;
-                btnText.textContent = "TẠO HÌNH ẢNH";
-            } catch (err) {
-                console.error("Lỗi khi tải font:", err);
-                btnText.textContent = "Lỗi tải font, vui lòng làm mới";
+        // --- STATE & CONFIGURATION ---
+        const state = {
+            mainText: "Lời hay ý đẹp từ kinh sách, mang lại sự an lạc và trí tuệ.",
+            noteText: "Nguồn: Lời Phật Dạy",
+            layout: 'layout1',
+            main: {
+                font: 'Playfair Display',
+                color: '#FFFFFF',
+                size: 50, // Relative size
+            },
+            note: {
+                font: 'Roboto',
+                color: '#FFFFFF',
+                size: 20, // Relative size
+            },
+            logo: {
+                size: 15, // Percentage of canvas width
             }
+        };
+
+        const layouts = {
+            layout1: {
+                name: 'Cổ Điển',
+                main: { v: 'top', h: 'center' },
+                logo: { v: 'bottom', h: 'left' },
+                note: { v: 'bottom', h: 'right' },
+            },
+            layout2: {
+                name: 'Hiện Đại',
+                main: { v: 'center', h: 'center' },
+                logo: { v: 'top', h: 'left' },
+                note: { v: 'bottom', h: 'right' },
+            },
+            layout3: {
+                name: 'Phá Cách',
+                main: { v: 'bottom', h: 'center' },
+                logo: { v: 'top', h: 'right' },
+                note: { v: 'top', h: 'left' },
+            }
+        };
+
+        const fontProfiles = [ 'Roboto', 'Be Vietnam Pro', 'Playfair Display', 'Times New Roman', 'Arial' ];
+        const colorProfiles = [ '#FFFFFF', '#422006', '#FFFBEB', '#FBBF24', '#F59E0B', '#9A3412', '#D1C4A8', '#FEF3C7', '#1C1917', '#57534E' ];
+
+        // --- DOM ELEMENTS ---
+        const canvas = document.getElementById('resultCanvas');
+        const ctx = canvas.getContext('2d');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        const logoImage = new Image();
+        const backgroundImage = new Image();
+        let isLogoLoaded = false;
+        let areFontsLoaded = false;
+
+        // --- INITIALIZATION ---
+        function init() {
+            cloneControls();
+            setupEventListeners();
+            loadAssets();
+            generateUIComponents();
+            updateAllInputs();
+        }
+        
+        function cloneControls() {
+            const desktopContainer = document.getElementById('desktop-controls-content');
+            const mobileLayoutContainer = document.getElementById('layout-controls');
+            const mobileTextContainer = document.getElementById('text-controls');
+            const mobileStyleContainer = document.getElementById('style-controls');
+
+            const layoutContent = document.getElementById('template-layout-controls').cloneNode(true);
+            const textContent = document.getElementById('template-text-controls').cloneNode(true);
+            const styleContent = document.getElementById('template-style-controls').cloneNode(true);
+
+            // For mobile
+            mobileLayoutContainer.appendChild(layoutContent.cloneNode(true));
+            mobileTextContainer.appendChild(textContent.cloneNode(true));
+            mobileStyleContainer.appendChild(styleContent.cloneNode(true));
+            
+            // For desktop
+            desktopContainer.appendChild(layoutContent);
+            desktopContainer.appendChild(textContent);
+            desktopContainer.appendChild(styleContent);
         }
 
-        function initializeUI() {
-            const createFontSelector = (container, name, defaultIndex) => {
-                container.innerHTML = '';
-                fontProfiles.forEach((profile, index) => {
-                    container.innerHTML += `
+        async function loadAssets() {
+            // Load fonts
+            try {
+                const fontChecks = fontProfiles.map(font => document.fonts.load(`700 12px "${font}"`));
+                await Promise.all(fontChecks);
+                console.log("Fonts loaded");
+                areFontsLoaded = true;
+            } catch (err) {
+                console.error("Font loading error:", err);
+            }
+
+            // Load logo
+            logoImage.src = 'logo.png'; // Make sure logo.png is in the same folder
+            logoImage.onload = () => {
+                console.log("Logo loaded");
+                isLogoLoaded = true;
+                redrawCanvas();
+            };
+            logoImage.onerror = () => {
+                console.warn("logo.png not found. The logo will not be displayed.");
+                isLogoLoaded = false;
+                redrawCanvas();
+            };
+
+            // Load background
+            backgroundImage.crossOrigin = "anonymous";
+            backgroundImage.src = 'https://placehold.co/1024x1024/8C5A2B/FDF8E1?text=Nen+Anh';
+            backgroundImage.onload = () => {
+                console.log("Background loaded");
+                canvas.width = backgroundImage.width;
+                canvas.height = backgroundImage.height;
+                redrawCanvas();
+            };
+            backgroundImage.onerror = () => {
+                console.error("Could not load background image.");
+                // Draw a fallback background
+                canvas.width = 1024;
+                canvas.height = 1024;
+                ctx.fillStyle = '#FDF8E1';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#422006';
+                ctx.textAlign = 'center';
+                ctx.fillText("Lỗi tải ảnh nền", canvas.width / 2, canvas.height / 2);
+            };
+        }
+
+        function generateUIComponents() {
+            // Layout Selector
+            const layoutContainer = document.getElementById('layout-selector');
+            for (const key in layouts) {
+                const layout = layouts[key];
+                const checked = key === state.layout ? 'checked' : '';
+                layoutContainer.innerHTML += `
+                    <div>
+                        <input type="radio" name="layout" id="${key}" value="${key}" class="hidden" ${checked}>
+                        <label for="${key}" class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
+                            <div class="layout-preview-box">
+                                ${generateLayoutPreview(layout)}
+                            </div>
+                            <span class="text-sm font-semibold mt-2 block">${layout.name}</span>
+                        </label>
+                    </div>
+                `;
+            }
+
+            // Font & Color Selectors
+            const createSelector = (containerId, items, name, stateKey, stateSubKey) => {
+                const container = document.querySelectorAll(`#${containerId}`);
+                let content = '';
+                items.forEach((item, index) => {
+                    const isChecked = item === state[stateKey][stateSubKey];
+                    const id = `${name}-${index}`;
+                    content += `
                         <div>
-                            <input type="radio" name="${name}" id="${name}-${profile.id}" value="${profile.id}" class="hidden" ${index === defaultIndex ? 'checked' : ''}>
-                            <label for="${name}-${profile.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full">
-                                <div style="font-family: ${profile.main}; font-size: 1.1rem; line-height: 1.2;">${profile.name}</div>
+                            <input type="radio" name="${name}" id="${id}" value="${item}" class="hidden" ${isChecked ? 'checked' : ''}>
+                            <label for="${id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${containerId.includes('color') ? `background-color:${item}` : `font-family:'${item}'`}">
+                                ${containerId.includes('color') ? '&nbsp;' : item}
                             </label>
                         </div>`;
                 });
-            };
-            createFontSelector(mainFontSelectorContainer, 'main-font', 1); // Be Vietnam Pro default
-            createFontSelector(noteFontSelectorContainer, 'note-font', 0); // Roboto default for note
-
-            const createStyleAndColorSelectors = (styleContainer, colorContainer, namePrefix, defaultIndex) => {
-                const populateColors = (styleId) => {
-                    colorContainer.innerHTML = '';
-                    const colors = styleId === 'styleBox' ? boxTextColors : glowTextColors;
-                    colors.forEach((color, index) => {
-                        colorContainer.innerHTML += `
-                            <div>
-                                <input type="radio" name="${namePrefix}-color" id="${namePrefix}-color-${index}" value='${JSON.stringify(color)}' class="hidden" ${index === 0 ? 'checked' : ''}>
-                                <label for="${namePrefix}-color-${index}" title="${color.name}" class="flex flex-col items-center cursor-pointer rounded-lg p-1 transition">
-                                    <div class="color-swatch" style="background-color: ${color.value};"></div>
-                                </label>
-                            </div>`;
-                    });
-                };
-
-                styleContainer.addEventListener('change', (e) => {
-                    if (e.target.name === `${namePrefix}-style`) populateColors(e.target.value);
-                });
-
-                styleProfiles.forEach((style, index) => {
-                    styleContainer.innerHTML += `
-                        <div>
-                            <input type="radio" name="${namePrefix}-style" id="${namePrefix}-${style.id}" value="${style.id}" class="hidden" ${index === defaultIndex ? 'checked' : ''}>
-                            <label for="${namePrefix}-${style.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${style.name}</label>
-                        </div>`;
-                });
-                populateColors(styleProfiles[defaultIndex].id);
+                container.forEach(c => c.innerHTML = content);
             };
             
-            createStyleAndColorSelectors(mainStyleSelectorContainer, mainColorSelectorContainer, 'main', 0);
-            createStyleAndColorSelectors(noteStyleSelectorContainer, noteColorSelectorContainer, 'note', 1);
-
-            sizeProfiles.forEach((size, index) => {
-                sizeSelectorContainer.innerHTML += `
-                    <div>
-                        <input type="radio" name="size" id="${size.id}" value="${size.value}" class="hidden" ${index === 2 ? 'checked' : ''}>
-                        <label for="${size.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${size.name}</label>
-                    </div>`;
-            });
-            mainPositionProfiles.forEach((pos, index) => {
-                mainPositionSelectorContainer.innerHTML += `
-                    <div>
-                        <input type="radio" name="main_position" id="${pos.id}" value="${pos.value}" class="hidden" ${index === 1 ? 'checked' : ''}>
-                        <label for="${pos.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${pos.name}</label>
-                    </div>`;
-            });
-            notePositionProfiles.forEach((pos, index) => {
-                notePositionSelectorContainer.innerHTML += `
-                    <div>
-                        <input type="radio" name="note_position" id="${pos.id}" value="${pos.value}" class="hidden" ${index === 3 ? 'checked' : ''}>
-                        <label for="${pos.id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 font-medium">${pos.name}</label>
-                    </div>`;
-            });
-            
-            loadFonts();
+            createSelector('main-font-selector', fontProfiles, 'main-font', 'main', 'font');
+            createSelector('note-font-selector', fontProfiles, 'note-font', 'note', 'font');
+            createSelector('main-color-selector', colorProfiles, 'main-color', 'main', 'color');
+            createSelector('note-color-selector', colorProfiles, 'note-color', 'note', 'color');
         }
 
-        initializeUI();
+        function generateLayoutPreview(layout) {
+            const positions = { top: '', center: '', bottom: ''};
+            const addElement = (pos, type) => `<div class="${type}-placeholder">${type.charAt(0).toUpperCase()}</div>`;
 
-        // --- CORE LOGIC ---
-        generateBtn.addEventListener('click', async () => {
-            const options = {
-                main: {
-                    fontId: document.querySelector('input[name="main-font"]:checked').value,
-                    styleId: document.querySelector('input[name="main-style"]:checked').value,
-                    size: parseInt(document.querySelector('input[name="size"]:checked').value, 10),
-                    position: document.querySelector('input[name="main_position"]:checked').value,
-                    color: JSON.parse(document.querySelector('input[name="main-color"]:checked').value),
-                },
-                note: {
-                    fontId: document.querySelector('input[name="note-font"]:checked').value,
-                    styleId: document.querySelector('input[name="note-style"]:checked').value,
-                    position: document.querySelector('input[name="note_position"]:checked').value,
-                    color: JSON.parse(document.querySelector('input[name="note-color"]:checked').value),
-                }
-            };
-            const texts = { text1: textInputs.text1.value, text3: textInputs.text3.value.trim() };
-            if (!texts.text1 && !texts.text3) { 
-                alert("Bạn chưa nhập nội dung nào cả!"); 
-                return; 
-            }
+            positions[layout.main.v] += addElement(layout.main.v, 'text');
+            positions[layout.logo.v] += addElement(layout.logo.v, 'logo');
+            positions[layout.note.v] += addElement(layout.note.v, 'note');
+            
+            return `
+                <div class="flex justify-around w-full">${positions.top}</div>
+                <div class="flex justify-around w-full">${positions.center}</div>
+                <div class="flex justify-around w-full">${positions.bottom}</div>
+            `;
+        }
+        
+        function updateAllInputs() {
+            document.querySelectorAll('#text1').forEach(el => el.value = state.mainText);
+            document.querySelectorAll('#text3').forEach(el => el.value = state.noteText);
+            document.querySelectorAll(`input[name="layout"][value="${state.layout}"]`).forEach(el => el.checked = true);
+            document.querySelectorAll(`input[name="main-font"][value="${state.main.font}"]`).forEach(el => el.checked = true);
+            document.querySelectorAll(`input[name="note-font"][value="${state.note.font}"]`).forEach(el => el.checked = true);
+            document.querySelectorAll(`input[name="main-color"][value="${state.main.color}"]`).forEach(el => el.checked = true);
+            document.querySelectorAll(`input[name="note-color"][value="${state.note.color}"]`).forEach(el => el.checked = true);
+        }
 
-            showModal(loadingModal);
-            try {
-                const prompt = generateLotusPrompt(); 
-                const imageDataURL = await queryStabilityAPI(prompt);
-                
-                // Draw on both canvases
-                await drawImageWithLayout(ctxDesktop, canvasDesktop, imageDataURL, options, texts);
-                await drawImageWithLayout(ctxMobile, canvasMobile, imageDataURL, options, texts);
+        // --- EVENT HANDLING ---
+        function setupEventListeners() {
+            // Use event delegation for controls that exist in multiple places
+            document.body.addEventListener('input', handleInput);
+            document.body.addEventListener('change', handleInput);
 
-                // Update download links
-                const finalImageURL = canvasDesktop.toDataURL('image/png');
-                downloadBtnDesktop.href = finalImageURL;
-                downloadBtnMobile.href = finalImageURL;
+            // Mobile panel controls
+            const mobileToolBtns = document.querySelectorAll('.mobile-tool-btn');
+            const panelsContainer = document.getElementById('panels-container');
+            mobileToolBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const panelId = btn.dataset.panel;
+                    const panel = document.getElementById(panelId);
+                    const isOpen = panel.classList.contains('is-open');
 
-                hideModal(loadingModal);
-
-                // Show result based on screen size
-                if (window.innerWidth >= 1024) { // lg breakpoint in Tailwind
-                    document.body.classList.add('results-shown-desktop');
-                } else {
-                    showModal(resultModalMobile);
-                }
-
-            } catch (error) {
-                hideModal(loadingModal);
-                alert(`Đã có lỗi xảy ra: ${error.message}`);
-                console.error('Lỗi:', error);
-            }
-        });
-
-        // --- EVENT LISTENERS FOR CLOSING/EDITING ---
-        closeBtnMobile.addEventListener('click', () => hideModal(resultModalMobile));
-        editAgainBtn.addEventListener('click', () => {
-             document.body.classList.remove('results-shown-desktop');
-        });
-
-        // --- DRAWING SYSTEM ---
-        async function drawImageWithLayout(ctx, canvas, imageDataURL, options, texts) {
-            return new Promise((resolve, reject) => {
-                const image = new Image();
-                image.crossOrigin = "anonymous"; // Important for tainted canvas
-                image.src = imageDataURL;
-                image.onload = () => {
-                    const size = Math.min(image.width, image.height);
-                    canvas.width = size;
-                    canvas.height = size;
-                    const sx = (image.width - size) / 2;
-                    const sy = (image.height - size) / 2;
-                    ctx.drawImage(image, sx, sy, size, size, 0, 0, size, size);
+                    closeAllPanels();
                     
-                    const mainFontProfile = fontProfiles.find(f => f.id === options.main.fontId);
-                    const mainStyleProfile = styleProfiles.find(s => s.id === options.main.styleId);
-                    const noteFontProfile = fontProfiles.find(f => f.id === options.note.fontId);
-                    const noteStyleProfile = styleProfiles.find(s => s.id === options.note.styleId);
-
-                    if (texts.text3) {
-                        const noteBlock = { size: 22, font: noteFontProfile.main, color: options.note.color.value, boxColor: noteStyleProfile.boxColor, outlineColor: options.note.color.outline, position: options.note.position };
-                        prepareTextBlock(ctx, texts.text3, noteBlock).drawCall(noteStyleProfile.method);
+                    if (!isOpen) {
+                        panel.classList.add('is-open');
+                        panelsContainer.style.visibility = 'visible';
+                        btn.classList.add('active');
                     }
-
-                    if (texts.text1) {
-                        const mainBlock = { size: options.main.size, font: mainFontProfile.main, color: options.main.color.value, boxColor: mainStyleProfile.boxColor, outlineColor: options.main.color.outline, position: options.main.position };
-                        prepareTextBlock(ctx, texts.text1, mainBlock).drawCall(mainStyleProfile.method);
-                    }
-                    
-                    URL.revokeObjectURL(image.src);
-                    resolve();
-                };
-                image.onerror = reject;
+                });
             });
-        }
-
-        function prepareTextBlock(ctx, text, block) {
-            const { width, height } = ctx.canvas;
-            const fontSize = block.size;
+            panelsContainer.addEventListener('click', closeAllPanels);
             
-            ctx.font = `bold ${fontSize}px ${block.font}`;
-            const lines = wrapText(ctx, text, width * 0.9);
-            const lineHeight = fontSize * 1.3;
-            const blockHeight = (lines.length * lineHeight);
-
-            let startY, startX, textAlign;
-
-            if (block.position.includes('Left')) {
-                startX = width * 0.05;
-                textAlign = 'left';
-            } else if (block.position.includes('Right')) {
-                startX = width * 0.95;
-                textAlign = 'right';
-            } else {
-                startX = width / 2;
-                textAlign = 'center';
-            }
-
-            if (block.position.includes('top')) {
-                startY = height * 0.05;
-            } else if (block.position.includes('bottom')) {
-                startY = height - blockHeight - (height * 0.05);
-            } else { // center
-                startY = (height - blockHeight) / 2;
-            }
-
-            return {
-                drawCall: (method) => {
-                    ctx.textAlign = textAlign;
-                    if (method === 'drawTextBox') {
-                        drawTextBox(ctx, lines, startX, startY, lineHeight, fontSize, block);
-                    } else {
-                        drawGlowedText(ctx, lines, startX, startY, lineHeight, fontSize, block);
-                    }
-                }
-            };
-        }
-
-        // --- DRAWING HELPERS ---
-        function drawTextBox(ctx, lines, x, startY, lineHeight, fontSize, block) {
-            const padding = fontSize * 0.4;
-            lines.forEach((line, index) => {
-                const textMetrics = ctx.measureText(line);
-                const lineWidth = textMetrics.width;
-                const bannerWidth = lineWidth + padding * 2;
-                const bannerHeight = fontSize + padding;
-                const currentLineY = startY + (index * lineHeight);
-                const bannerX = x - (ctx.textAlign === 'center' ? bannerWidth / 2 : (ctx.textAlign === 'right' ? bannerWidth : 0));
-                
-                ctx.fillStyle = block.boxColor;
-                ctx.beginPath();
-                ctx.roundRect(bannerX, currentLineY, bannerWidth, bannerHeight, 10);
-                ctx.fill();
-
-                ctx.fillStyle = block.color;
-                ctx.textBaseline = 'top';
-                ctx.fillText(line, x, currentLineY + padding / 2);
+            // Download button
+            downloadBtn.addEventListener('click', () => {
+                downloadBtn.href = canvas.toDataURL('image/png');
             });
         }
+        
+        function handleInput(e) {
+            const target = e.target;
+            const name = target.name;
+            const value = target.value;
 
-        function drawGlowedText(ctx, lines, x, startY, lineHeight, fontSize, block) {
-            ctx.textBaseline = 'top';
-            ctx.shadowColor = block.outlineColor;
-            ctx.fillStyle = block.color;
-            ctx.shadowBlur = 15;
+            if (target.id === 'text1') state.mainText = value;
+            if (target.id === 'text3') state.noteText = value;
+            if (name === 'layout') state.layout = value;
+            if (name === 'main-font') state.main.font = value;
+            if (name === 'note-font') state.note.font = value;
+            if (name === 'main-color') state.main.color = value;
+            if (name === 'note-color') state.note.color = value;
+            
+            redrawCanvas();
+        }
+
+        function closeAllPanels() {
+            document.querySelectorAll('.mobile-panel.is-open').forEach(p => p.classList.remove('is-open'));
+            document.querySelectorAll('.mobile-tool-btn.active').forEach(b => b.classList.remove('active'));
+            document.getElementById('panels-container').style.visibility = 'hidden';
+        }
+
+        // --- DRAWING ENGINE ---
+        function redrawCanvas() {
+            if (!backgroundImage.complete || !areFontsLoaded) {
+                // Don't draw if assets aren't ready, except for logo error case
+                if(!isLogoLoaded && !logoImage.src.endsWith('logo.png')) return;
+            }
+            
+            // 1. Clear and draw background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+            const currentLayout = layouts[state.layout];
+
+            // 2. Draw Logo
+            if (isLogoLoaded) {
+                drawLogo(currentLayout.logo);
+            }
+
+            // 3. Draw Main Text
+            if (state.mainText.trim()) {
+                drawText(state.mainText, state.main, currentLayout.main);
+            }
+
+            // 4. Draw Note Text
+            if (state.noteText.trim()) {
+                drawText(state.noteText, state.note, currentLayout.note);
+            }
+        }
+        
+        function drawLogo(position) {
+            const logoSize = canvas.width * (state.logo.size / 100);
+            const margin = canvas.width * 0.04;
+            
+            const pos = getXY(position, margin, logoSize, logoSize);
+            
+            ctx.drawImage(logoImage, pos.x, pos.y, logoSize, logoSize);
+        }
+
+        function drawText(text, style, position) {
+            const fontSize = canvas.width * (style.size / 1000);
+            const margin = canvas.width * 0.04;
+            const maxWidth = canvas.width - (margin * 2);
+            
+            ctx.font = `bold ${fontSize}px "${style.font}"`;
+            ctx.fillStyle = style.color;
+            
+            // Text shadow for better readability
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 8;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 2;
+
+            const lines = wrapText(ctx, text, maxWidth);
+            const lineHeight = fontSize * 1.3;
+            const textBlockHeight = lines.length * lineHeight;
+
+            const pos = getXY(position, margin, maxWidth, textBlockHeight);
+
+            ctx.textAlign = pos.textAlign;
             
             lines.forEach((line, index) => {
-                ctx.fillText(line, x, startY + (index * lineHeight));
+                ctx.fillText(line, pos.x, pos.y + (index * lineHeight));
             });
+            
+            // Reset shadow
             ctx.shadowColor = 'transparent';
         }
 
-        // --- UTILITY FUNCTIONS ---
+        function getXY(position, margin, blockWidth, blockHeight) {
+            let x, y, textAlign;
+
+            // Horizontal
+            switch(position.h) {
+                case 'left':
+                    x = margin;
+                    textAlign = 'left';
+                    break;
+                case 'right':
+                    x = canvas.width - margin;
+                    textAlign = 'right';
+                    break;
+                case 'center':
+                default:
+                    x = canvas.width / 2;
+                    textAlign = 'center';
+            }
+
+            // Vertical
+            switch(position.v) {
+                case 'top':
+                    y = margin;
+                    break;
+                case 'bottom':
+                    y = canvas.height - margin - blockHeight;
+                    break;
+                case 'center':
+                default:
+                    y = (canvas.height / 2) - (blockHeight / 2);
+            }
+            
+            // For text drawing, textBaseline is top
+            if (position.v !== 'bottom') {
+                 y += (ctx.measureText('M').width * 1.2); // approximation of line height
+            }
+
+
+            return { x, y, textAlign };
+        }
+
         function wrapText(ctx, text, maxWidth) {
             const finalLines = [];
-            const initialLines = text.split('\n'); 
-            initialLines.forEach(line => {
-                const words = line.split(' ');
+            const paragraphs = text.split('\n');
+            paragraphs.forEach(p => {
+                const words = p.split(' ');
                 let currentLine = words[0] || '';
                 for (let i = 1; i < words.length; i++) {
                     const word = words[i];
                     const testLine = currentLine + " " + word;
-                    if (ctx.measureText(testLine).width < maxWidth && word !== '') {
-                        currentLine += " " + word;
+                    if (ctx.measureText(testLine).width < maxWidth) {
+                        currentLine = testLine;
                     } else {
                         finalLines.push(currentLine);
                         currentLine = word;
@@ -567,38 +607,8 @@
             return finalLines;
         }
 
-        function showModal(modal) {
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-        }
-        function hideModal(modal) {
-            modal.classList.add('opacity-0', 'pointer-events-none');
-        }
-
-        function generateLotusPrompt() {
-            const base = "masterpiece, best quality, beautiful anime style illustration of a lotus flower, scenic, soft lighting, clean lines, square image, buddhist theme, serene, spiritual";
-            const styles = ["on a serene pond at sunrise with mist", "in a mystical zen garden with cinematic light", "minimalist, clean lines, vibrant gold and brown colors", "with a traditional asian temple in the background fog", "glowing softly in a dark, peaceful environment"];
-            return `${base}, ${styles[Math.floor(Math.random() * styles.length)]}`;
-        }
-
-        async function queryStabilityAPI(prompt) {
-            const response = await fetch(`/api/generate-image`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt }),
-            });
-
-            if (!response.ok) {
-                const errorResult = await response.json();
-                throw new Error(`Lỗi từ máy chủ: ${errorResult.error || 'Không rõ lỗi'}`);
-            }
-
-            const responseJSON = await response.json();
-            if (!responseJSON.artifacts || responseJSON.artifacts.length === 0) {
-                 throw new Error('Không nhận được ảnh từ API.');
-            }
-            const imageBase64 = responseJSON.artifacts[0].base64;
-            return `data:image/png;base64,${imageBase64}`;
-        }
+        // --- START THE APP ---
+        init();
     </script>
 </body>
 </html>
