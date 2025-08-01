@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trợ Lý Thiết Kế V4 - Hoàn Thiện</title>
+    <title>Trợ Lý Thiết Kế V5 - Sửa Lỗi Toàn Diện</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,16 +30,13 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
-        .choice-selector input:checked + label {
-            border-color: var(--mau-vang-cam);
-            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
-            background-color: #FFFBEB;
-        }
+        .choice-selector input:checked + label,
         .layout-selector input:checked + label {
             border-color: var(--mau-vang-cam);
             box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
             background-color: #FFFBEB;
         }
+       
         .layout-preview-box {
             aspect-ratio: 1 / 1;
             border: 2px dashed #D1C4A8;
@@ -75,9 +72,7 @@
 
         details > summary { list-style: none; cursor: pointer; }
         details > summary::-webkit-details-marker { display: none; }
-        details .accordion-icon { transition: transform 0.3s ease; }
-        details[open] .accordion-icon { transform: rotate(90deg); }
-
+        
         .loader { 
             border: 5px solid #D1C4A8; border-top: 5px solid #8C5A2B;
             border-radius: 50%; width: 50px; height: 50px; 
@@ -104,7 +99,7 @@
         <!-- Desktop Controls -->
         <div id="controls-panel" class="hidden lg:block w-full lg:w-1/3 bg-white border-l-4 border-yellow-100 p-8 space-y-6 overflow-y-auto">
             <header class="text-center mb-6">
-                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V4</h1>
+                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V5</h1>
                 <p class="text-amber-600 mt-1">Giao diện hoàn thiện, trải nghiệm tối ưu.</p>
             </header>
             <div id="desktop-controls-content" class="space-y-6"></div>
@@ -274,9 +269,10 @@
             cloneControls();
             generateUIComponents();
             setupEventListeners();
-            loadInitialAssets();
-            updateAllInputs();
-            handleImageGeneration();
+            loadInitialAssets().then(() => {
+                updateAllInputs();
+                handleImageGeneration();
+            });
         }
         
         function cloneControls() {
@@ -296,7 +292,7 @@
         }
 
         async function loadInitialAssets() {
-            const fontChecks = fontProfiles.map(font => document.fonts.load(`700 12px "${font}"`));
+            const fontChecks = fontProfiles.map(font => document.fonts.load(`12px "${font}"`));
             const logoPromise = new Promise(resolve => {
                 logoImage.src = 'logo.png';
                 logoImage.onload = () => { isLogoLoaded = true; resolve(); };
@@ -306,7 +302,6 @@
             await Promise.all([...fontChecks, logoPromise]);
             areFontsLoaded = true;
             console.log("Fonts and logo loaded.");
-            redrawCanvas();
         }
         
         function setBackgroundImage(src) {
@@ -328,7 +323,7 @@
              const uniqueId = (base) => `${base}-${Math.random().toString(36).substr(2, 9)}`;
 
             document.querySelectorAll('.layout-selector').forEach(container => {
-                const parentId = container.closest('.mobile-panel, #controls-panel').id;
+                const parentId = container.closest('.mobile-panel, #desktop-controls-content').id;
                 container.innerHTML = '';
                 for (const key in layouts) {
                     const layout = layouts[key];
@@ -346,7 +341,7 @@
 
             const createSelector = (selectorClass, items, name) => {
                 document.querySelectorAll(`.${selectorClass}`).forEach(container => {
-                    const parentId = container.closest('.mobile-panel, #controls-panel').id;
+                    const parentId = container.closest('.mobile-panel, #desktop-controls-content').id;
                     container.innerHTML = '';
                     let content = '';
                     items.forEach((item) => {
