@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trợ Lý Thiết Kế V3 - Tích hợp AI</title>
+    <title>Trợ Lý Thiết Kế V4 - Hoàn Thiện</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,6 +64,7 @@
         .mobile-panel.is-open { transform: translateY(0); visibility: visible; }
         .mobile-panel-content {
             overflow-y: auto;
+            padding: 0.25rem; /* Add some padding for scrollbar */
         }
         #mobile-toolbar button.active { color: var(--mau-vang-cam); background-color: #FFFBEB; }
 
@@ -89,7 +90,6 @@
             <div id="canvas-container" class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
                 <canvas id="resultCanvas" class="w-full h-auto rounded-lg"></canvas>
             </div>
-            <!-- Loading Indicator -->
             <div id="loading-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex-col items-center justify-center z-20 hidden">
                 <div class="loader"></div>
                 <p class="text-white font-semibold mt-4">Đang tạo ảnh nền, vui lòng chờ...</p>
@@ -99,10 +99,10 @@
         <!-- Desktop Controls -->
         <div id="controls-panel" class="hidden lg:block w-full lg:w-1/3 bg-white border-l-4 border-yellow-100 p-8 space-y-6 overflow-y-auto">
             <header class="text-center mb-6">
-                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V3</h1>
-                <p class="text-amber-600 mt-1">Tạo ảnh AI & Tùy chỉnh nâng cao.</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V4</h1>
+                <p class="text-amber-600 mt-1">Giao diện hoàn thiện, trải nghiệm tối ưu.</p>
             </header>
-            <div id="desktop-controls-content"></div>
+            <div id="desktop-controls-content" class="space-y-6"></div>
              <a id="downloadBtn" href="#" download="thiep-anh-phat-giao.png" class="mt-6 w-full text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 Tải Về Hình Ảnh
@@ -128,7 +128,7 @@
         </div>
         <div id="style-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
              <h3 class="font-bold text-lg mb-4 text-center flex-shrink-0">Bước 4: Tùy Chỉnh Font</h3>
-            <section id="style-controls" class="mobile-panel-content space-y-4"></section>
+            <section id="style-controls" class="mobile-panel-content"></section>
         </div>
 
         <!-- Mobile Toolbar -->
@@ -158,7 +158,8 @@
     
     <!-- Templates for cloning -->
     <div id="templates" class="hidden">
-        <div id="template-image-gen-controls">
+        <div id="template-image-gen-controls" class="control-panel-section bg-green-50">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 1: Tạo Ảnh Nền</h2>
             <div class="space-y-4">
                 <p class="text-sm text-amber-700">Bấm nút dưới đây để tạo một ảnh nền ngẫu nhiên theo chủ đề hoa sen Phật giáo.</p>
                 <button id="generate-random-image-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2">
@@ -167,7 +168,8 @@
                 </button>
             </div>
         </div>
-        <div id="template-layout-controls">
+        <div id="template-layout-controls" class="control-panel-section bg-amber-50">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 2: Bố Cục & Logo</h2>
             <div class="space-y-4">
                 <h3 class="text-lg font-semibold text-amber-900">Chọn Mẫu Bố Cục</h3>
                 <div class="grid grid-cols-3 gap-3 layout-selector" id="layout-selector"></div>
@@ -177,7 +179,8 @@
                 </div>
             </div>
         </div>
-        <div id="template-text-controls">
+        <div id="template-text-controls" class="control-panel-section bg-amber-50">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 3: Nhập Nội Dung</h2>
             <div class="space-y-4">
                 <div>
                     <label for="text1" class="block text-sm font-medium text-amber-800">Nội dung chính</label>
@@ -189,7 +192,8 @@
                 </div>
             </div>
         </div>
-        <div id="template-style-controls">
+        <div id="template-style-controls" class="control-panel-section bg-amber-50">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 4: Tùy Chỉnh Font</h2>
             <div class="space-y-4">
                  <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
                     <summary class="flex justify-between items-center font-semibold text-amber-900">Văn Bản Chính</summary>
@@ -204,7 +208,7 @@
                         </div>
                     </div>
                 </details>
-                <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition">
+                <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
                     <summary class="flex justify-between items-center font-semibold text-amber-900">Ghi Chú</summary>
                      <div class="mt-4 space-y-5">
                         <div>
@@ -264,30 +268,19 @@
         
         function cloneControls() {
             const desktopContainer = document.getElementById('desktop-controls-content');
-            const containers = {
+            const templates = {
                 'image-gen-controls': document.getElementById('template-image-gen-controls'),
                 'layout-controls': document.getElementById('template-layout-controls'),
                 'text-controls': document.getElementById('template-text-controls'),
                 'style-controls': document.getElementById('template-style-controls'),
             };
 
-            for (const key in containers) {
-                const template = containers[key];
+            for (const key in templates) {
+                const templateNode = templates[key];
                 // Mobile
-                document.getElementById(key).appendChild(template.cloneNode(true));
+                document.getElementById(key).appendChild(templateNode.cloneNode(true));
                 // Desktop
-                if (key !== 'image-gen-controls') { // Keep image gen separate on desktop for clarity
-                     const desktopSection = document.createElement('div');
-                     desktopSection.className = 'control-panel-section bg-amber-50 mb-6';
-                     desktopSection.innerHTML = ` <h2 class="text-xl font-bold text-amber-900 mb-3">${template.firstElementChild.querySelector('h2, h3')?.textContent || ''}</h2>`;
-                     desktopSection.appendChild(template.cloneNode(true));
-                     desktopContainer.appendChild(desktopSection);
-                } else {
-                     const desktopSection = document.createElement('div');
-                     desktopSection.className = 'control-panel-section bg-green-50 mb-6';
-                     desktopSection.appendChild(template.cloneNode(true));
-                     desktopContainer.appendChild(desktopSection);
-                }
+                desktopContainer.appendChild(templateNode.cloneNode(true));
             }
         }
 
@@ -321,14 +314,18 @@
         }
 
         function generateUIComponents() {
-            document.querySelectorAll('#layout-selector').forEach(container => {
-                container.innerHTML = ''; // Clear before generating
+             const uniqueId = (base) => `${base}-${Math.random().toString(36).substr(2, 9)}`;
+
+            document.querySelectorAll('.layout-selector').forEach(container => {
+                const parentId = container.closest('.mobile-panel, #controls-panel').id;
+                container.innerHTML = '';
                 for (const key in layouts) {
                     const layout = layouts[key];
+                    const radioId = uniqueId(key);
                     container.innerHTML += `
                         <div>
-                            <input type="radio" name="layout" id="${key}-${container.closest('.mobile-panel, #controls-panel').id}" value="${key}" class="hidden">
-                            <label for="${key}-${container.closest('.mobile-panel, #controls-panel').id}" class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
+                            <input type="radio" name="layout-${parentId}" id="${radioId}" value="${key}" class="hidden">
+                            <label for="${radioId}" class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
                                 <div class="layout-preview-box">${generateLayoutPreview(layout)}</div>
                                 <span class="text-sm font-semibold mt-2 block">${layout.name}</span>
                             </label>
@@ -338,14 +335,15 @@
 
             const createSelector = (containerId, items, name, stateKey, stateSubKey) => {
                 document.querySelectorAll(`#${containerId}`).forEach(container => {
+                    const parentId = container.closest('.mobile-panel, #controls-panel').id;
                     container.innerHTML = '';
                     let content = '';
-                    items.forEach((item, index) => {
-                        const id = `${name}-${index}-${container.closest('.mobile-panel, #controls-panel').id}`;
+                    items.forEach((item) => {
+                        const radioId = uniqueId(name);
                         content += `
                             <div>
-                                <input type="radio" name="${name}" id="${id}" value="${item}" class="hidden">
-                                <label for="${id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${containerId.includes('color') ? `background-color:${item}` : `font-family:'${item}'`}">
+                                <input type="radio" name="${name}-${parentId}" id="${radioId}" value="${item}" class="hidden">
+                                <label for="${radioId}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${containerId.includes('color') ? `background-color:${item}` : `font-family:'${item}'`}">
                                     ${containerId.includes('color') ? '&nbsp;' : item}
                                 </label>
                             </div>`;
@@ -370,15 +368,19 @@
         }
         
         function updateAllInputs() {
-            document.querySelectorAll('#text1').forEach(el => el.value = state.mainText);
-            document.querySelectorAll('#text3').forEach(el => el.value = state.noteText);
-            document.querySelectorAll(`input[name="layout"][value="${state.layout}"]`).forEach(el => el.checked = true);
-            document.querySelectorAll(`input[name="main-font"][value="${state.main.font}"]`).forEach(el => el.checked = true);
-            document.querySelectorAll(`input[name="note-font"][value="${state.note.font}"]`).forEach(el => el.checked = true);
-            document.querySelectorAll(`input[name="main-color"][value="${state.main.color}"]`).forEach(el => el.checked = true);
-            document.querySelectorAll(`input[name="note-color"][value="${state.note.color}"]`).forEach(el => el.checked = true);
-            document.querySelectorAll('#logo-size').forEach(el => el.value = state.logo.size);
-            document.querySelectorAll('#logo-size-value').forEach(el => el.textContent = state.logo.size);
+            document.querySelectorAll('textarea[id^="text1"]').forEach(el => el.value = state.mainText);
+            document.querySelectorAll('input[id^="text3"]').forEach(el => el.value = state.noteText);
+            
+            document.querySelectorAll(`input[type="radio"]`).forEach(el => {
+                if (el.name.startsWith('layout')) el.checked = el.value === state.layout;
+                if (el.name.startsWith('main-font')) el.checked = el.value === state.main.font;
+                if (el.name.startsWith('note-font')) el.checked = el.value === state.note.font;
+                if (el.name.startsWith('main-color')) el.checked = el.value === state.main.color;
+                if (el.name.startsWith('note-color')) el.checked = el.value === state.note.color;
+            });
+            
+            document.querySelectorAll('input[id^="logo-size"]').forEach(el => el.value = state.logo.size);
+            document.querySelectorAll('span[id^="logo-size-value"]').forEach(el => el.textContent = state.logo.size);
         }
 
         // --- EVENT HANDLING ---
@@ -386,7 +388,7 @@
             document.body.addEventListener('input', handleInput);
             document.body.addEventListener('change', handleInput);
             document.body.addEventListener('click', (e) => {
-                if (e.target.closest('#generate-random-image-btn')) {
+                if (e.target.closest('button[id^="generate-random-image-btn"]')) {
                     handleImageGeneration();
                 }
                 if (e.target.closest('#mobile-download-btn')) {
@@ -410,7 +412,11 @@
                     }
                 });
             });
-            panelsContainer.addEventListener('click', closeAllPanels);
+            panelsContainer.addEventListener('click', (e) => {
+                if (e.target === panelsContainer) {
+                    closeAllPanels();
+                }
+            });
             
             downloadBtn.addEventListener('click', () => {
                 downloadBtn.href = canvas.toDataURL('image/png');
@@ -422,21 +428,16 @@
             const name = target.name;
             const value = target.value;
             
-            if (target.id.startsWith('text1')) state.mainText = value;
-            if (target.id.startsWith('text3')) state.noteText = value;
-            if (target.id.startsWith('logo-size')) {
-                state.logo.size = value;
-                document.querySelectorAll('#logo-size-value').forEach(el => el.textContent = value);
-            }
-            if (name === 'layout') state.layout = value;
-            if (name === 'main-font') state.main.font = value;
-            if (name === 'note-font') state.note.font = value;
-            if (name === 'main-color') state.main.color = value;
-            if (name === 'note-color') state.note.color = value;
+            if (target.id.includes('text1')) state.mainText = value;
+            if (target.id.includes('text3')) state.noteText = value;
+            if (target.id.includes('logo-size')) state.logo.size = value;
+            if (name.includes('layout')) state.layout = value;
+            if (name.includes('main-font')) state.main.font = value;
+            if (name.includes('note-font')) state.note.font = value;
+            if (name.includes('main-color')) state.main.color = value;
+            if (name.includes('note-color')) state.note.color = value;
 
-            // Sync inputs across desktop/mobile
             updateAllInputs();
-            
             redrawCanvas();
         }
 
@@ -503,8 +504,13 @@
         function drawLogo(position) {
             const logoSize = canvas.width * (state.logo.size / 100);
             const margin = canvas.width * 0.04;
-            const pos = getXY(position, margin, logoSize, logoSize);
-            ctx.drawImage(logoImage, pos.x, pos.y, logoSize, logoSize);
+            let { x, y } = getXY(position, margin, logoSize, logoSize);
+            
+            if (position.h === 'right') {
+                x = canvas.width - margin - logoSize;
+            }
+
+            ctx.drawImage(logoImage, x, y, logoSize, logoSize);
         }
 
         function drawText(text, style, position) {
@@ -553,7 +559,7 @@
                 let currentLine = '';
                 const words = p.split(' ');
                 if (words.length > 0) {
-                    currentLine = words[0];
+                    currentLine = words[0] || '';
                     for (let i = 1; i < words.length; i++) {
                         if (ctx.measureText(currentLine + " " + words[i]).width < maxWidth) {
                             currentLine += " " + words[i];
