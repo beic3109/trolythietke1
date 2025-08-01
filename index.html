@@ -218,6 +218,26 @@
                              <label class="font-semibold text-sm text-amber-800">Kích thước chữ: <span data-value-for="main-font-size">50</span></label>
                              <input type="range" data-input="main-font-size" min="10" max="120" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                         </div>
+                        <!-- Main Text Background Controls -->
+                        <div class="pt-4 border-t border-amber-200">
+                            <div class="flex items-center justify-between">
+                                <label class="font-semibold text-sm text-amber-800">Nền Văn Bản</label>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                    <input type="checkbox" data-input="main-bg-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                    <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                            <div data-container="main-bg-controls" class="space-y-5 mt-3 hidden">
+                                <div>
+                                    <label class="font-semibold text-sm text-amber-800">Màu Nền</label>
+                                    <div class="grid grid-cols-5 gap-2 choice-selector main-bg-color-selector"></div>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-sm text-amber-800">Độ trong suốt: <span data-value-for="main-bg-opacity">0.4</span></label>
+                                    <input type="range" data-input="main-bg-opacity" min="0" max="1" step="0.1" value="0.4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </details>
                 <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
@@ -235,6 +255,26 @@
                              <label class="font-semibold text-sm text-amber-800">Kích thước chữ: <span data-value-for="note-font-size">20</span></label>
                              <input type="range" data-input="note-font-size" min="10" max="60" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                         </div>
+                        <!-- Note Text Background Controls -->
+                        <div class="pt-4 border-t border-amber-200">
+                            <div class="flex items-center justify-between">
+                                <label class="font-semibold text-sm text-amber-800">Nền Văn Bản</label>
+                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                    <input type="checkbox" data-input="note-bg-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                    <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                </div>
+                            </div>
+                            <div data-container="note-bg-controls" class="space-y-5 mt-3 hidden">
+                                <div>
+                                    <label class="font-semibold text-sm text-amber-800">Màu Nền</label>
+                                    <div class="grid grid-cols-5 gap-2 choice-selector note-bg-color-selector"></div>
+                                </div>
+                                <div>
+                                    <label class="font-semibold text-sm text-amber-800">Độ trong suốt: <span data-value-for="note-bg-opacity">0.4</span></label>
+                                    <input type="range" data-input="note-bg-opacity" min="0" max="1" step="0.1" value="0.4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
                      </div>
                 </details>
             </div>
@@ -247,9 +287,19 @@
             mainText: "Lời hay ý đẹp từ kinh sách, mang lại sự an lạc và trí tuệ.",
             noteText: "Nguồn: Lời Phật Dạy",
             layout: 'layout1',
-            main: { font: 'Playfair Display', color: '#FFFFFF', fontSize: 50 },
-            note: { font: 'Roboto', color: '#FFFFFF', fontSize: 20 },
-            logo: { size: 15, visible: false } // Logo is off by default
+            main: { 
+                font: 'Playfair Display', 
+                color: '#FFFFFF', 
+                fontSize: 50,
+                background: { visible: true, color: '#000000', opacity: 0.4 }
+            },
+            note: { 
+                font: 'Roboto', 
+                color: '#FFFFFF', 
+                fontSize: 20,
+                background: { visible: true, color: '#000000', opacity: 0.4 }
+            },
+            logo: { size: 15, visible: false }
         };
 
         const layouts = {
@@ -259,7 +309,7 @@
         };
 
         const fontProfiles = [ 'Roboto', 'Be Vietnam Pro', 'Playfair Display', 'Times New Roman', 'Arial' ];
-        const colorProfiles = [ '#FFFFFF', '#422006', '#FFFBEB', '#FBBF24', '#F59E0B', '#9A3412', '#D1C4A8', '#FEF3C7', '#1C1917', '#57534E' ];
+        const colorProfiles = [ '#FFFFFF', '#000000', '#422006', '#FFFBEB', '#FBBF24', '#F59E0B', '#9A3412', '#D1C4A8', '#FEF3C7', '#1C1917', '#57534E' ];
 
         // --- DOM ELEMENTS ---
         const canvas = document.getElementById('resultCanvas');
@@ -280,12 +330,12 @@
             setupEventListeners();
             loadInitialAssets().then(() => {
                 updateAllInputs();
-                drawInitialCanvas(); // Draw a placeholder instead of generating an image
+                drawInitialCanvas();
             });
         }
         
         function setupLayout() {
-            if (window.innerWidth < 1024) { // Corresponds to lg: breakpoint
+            if (window.innerWidth < 1024) { 
                 const mobileCanvasContainer = document.getElementById('mobile-canvas-container');
                 mobileCanvasContainer.appendChild(canvas);
             }
@@ -302,9 +352,7 @@
 
             for (const key in templates) {
                 const templateNode = templates[key];
-                // Desktop
                 desktopContainer.appendChild(templateNode.cloneNode(true));
-                // Mobile
                 document.getElementById(`mobile-${key}-panel`).appendChild(templateNode.cloneNode(true));
             }
         }
@@ -325,9 +373,9 @@
         function drawInitialCanvas() {
             canvas.width = 1024;
             canvas.height = 1024;
-            ctx.fillStyle = '#E5E7EB'; // Light gray background
+            ctx.fillStyle = '#E5E7EB';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#6B7280'; // Darker gray text
+            ctx.fillStyle = '#6B7280';
             ctx.textAlign = 'center';
             ctx.font = '30px "Be Vietnam Pro"';
             ctx.fillText('Tải lên hoặc Tạo ảnh nền', canvas.width / 2, canvas.height / 2);
@@ -370,6 +418,8 @@
             createSelector('note-font-selector', fontProfiles, 'note-font', 'font');
             createSelector('main-color-selector', colorProfiles, 'main-color', 'color');
             createSelector('note-color-selector', colorProfiles, 'note-color', 'color');
+            createSelector('main-bg-color-selector', colorProfiles, 'main-bg-color', 'color');
+            createSelector('note-bg-color-selector', colorProfiles, 'note-bg-color', 'color');
             
             document.querySelectorAll('.layout-selector').forEach(container => {
                 container.innerHTML = '';
@@ -397,26 +447,44 @@
         }
         
         function updateAllInputs() {
+            // Text values
             document.querySelectorAll('[data-input="main-text"]').forEach(el => el.value = state.mainText);
             document.querySelectorAll('[data-input="note-text"]').forEach(el => el.value = state.noteText);
             
+            // Layout
             document.querySelectorAll('input[data-input="layout"]').forEach(el => el.checked = el.value === state.layout);
-            document.querySelectorAll('input[data-input="main-font"]').forEach(el => el.checked = el.value === state.main.font);
-            document.querySelectorAll('input[data-input="note-font"]').forEach(el => el.checked = el.value === state.note.font);
-            document.querySelectorAll('input[data-input="main-color"]').forEach(el => el.checked = el.value === state.main.color);
-            document.querySelectorAll('input[data-input="note-color"]').forEach(el => el.checked = el.value === state.note.color);
-            document.querySelectorAll('input[data-input="logo-visible"]').forEach(el => el.checked = state.logo.visible);
             
+            // Logo
+            document.querySelectorAll('input[data-input="logo-visible"]').forEach(el => el.checked = state.logo.visible);
             document.querySelectorAll('[data-input="logo-size"]').forEach(el => el.value = state.logo.size);
             document.querySelectorAll('[data-value-for="logo-size"]').forEach(el => el.textContent = state.logo.size);
+            document.querySelectorAll('[data-container="logo-size"]').forEach(c => c.style.display = state.logo.visible ? 'block' : 'none');
+
+            // Main Text Style
+            document.querySelectorAll('input[data-input="main-font"]').forEach(el => el.checked = el.value === state.main.font);
+            document.querySelectorAll('input[data-input="main-color"]').forEach(el => el.checked = el.value === state.main.color);
             document.querySelectorAll('[data-input="main-font-size"]').forEach(el => el.value = state.main.fontSize);
             document.querySelectorAll('[data-value-for="main-font-size"]').forEach(el => el.textContent = state.main.fontSize);
+            
+            // Main Text Background
+            document.querySelectorAll('input[data-input="main-bg-visible"]').forEach(el => el.checked = state.main.background.visible);
+            document.querySelectorAll('input[data-input="main-bg-color"]').forEach(el => el.checked = el.value === state.main.background.color);
+            document.querySelectorAll('[data-input="main-bg-opacity"]').forEach(el => el.value = state.main.background.opacity);
+            document.querySelectorAll('[data-value-for="main-bg-opacity"]').forEach(el => el.textContent = state.main.background.opacity);
+            document.querySelectorAll('[data-container="main-bg-controls"]').forEach(c => c.style.display = state.main.background.visible ? 'block' : 'none');
+            
+            // Note Text Style
+            document.querySelectorAll('input[data-input="note-font"]').forEach(el => el.checked = el.value === state.note.font);
+            document.querySelectorAll('input[data-input="note-color"]').forEach(el => el.checked = el.value === state.note.color);
             document.querySelectorAll('[data-input="note-font-size"]').forEach(el => el.value = state.note.fontSize);
             document.querySelectorAll('[data-value-for="note-font-size"]').forEach(el => el.textContent = state.note.fontSize);
-
-            document.querySelectorAll('[data-container="logo-size"]').forEach(container => {
-                container.style.display = state.logo.visible ? 'block' : 'none';
-            });
+            
+            // Note Text Background
+            document.querySelectorAll('input[data-input="note-bg-visible"]').forEach(el => el.checked = state.note.background.visible);
+            document.querySelectorAll('input[data-input="note-bg-color"]').forEach(el => el.checked = el.value === state.note.background.color);
+            document.querySelectorAll('[data-input="note-bg-opacity"]').forEach(el => el.value = state.note.background.opacity);
+            document.querySelectorAll('[data-value-for="note-bg-opacity"]').forEach(el => el.textContent = state.note.background.opacity);
+            document.querySelectorAll('[data-container="note-bg-controls"]').forEach(c => c.style.display = state.note.background.visible ? 'block' : 'none');
         }
 
         // --- EVENT HANDLING ---
@@ -437,21 +505,13 @@
                     }
                 }
 
-                if (e.target.closest('[data-action="generate-image"]')) {
-                    handleImageGeneration();
-                }
-                if (e.target.closest('[data-action="upload-image"]')) {
-                    e.target.closest('.control-panel-section').querySelector('.image-upload-input').click();
-                }
-                if (e.target.closest('#mobile-download-btn')) {
-                    downloadBtn.click();
-                }
+                if (e.target.closest('[data-action="generate-image"]')) handleImageGeneration();
+                if (e.target.closest('[data-action="upload-image"]')) e.target.closest('.control-panel-section').querySelector('.image-upload-input').click();
+                if (e.target.closest('#mobile-download-btn')) downloadBtn.click();
             });
 
             document.body.addEventListener('change', (e) => {
-                if (e.target.classList.contains('image-upload-input')) {
-                    handleImageUpload(e.target.files[0]);
-                }
+                if (e.target.classList.contains('image-upload-input')) handleImageUpload(e.target.files[0]);
             });
 
             const mobileToolBtns = document.querySelectorAll('.mobile-tool-btn');
@@ -459,15 +519,12 @@
                 btn.addEventListener('click', () => {
                     const panelId = btn.dataset.panel;
                     if (!panelId) return;
-
                     document.querySelectorAll('.mobile-panel-instance').forEach(p => p.classList.add('hidden'));
                     document.getElementById(panelId).classList.remove('hidden');
-                    
                     mobileToolBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                 });
             });
-            // Set initial active button
             document.querySelector('.mobile-tool-btn[data-panel="mobile-image-gen-panel"]').classList.add('active');
             
             downloadBtn.addEventListener('click', () => {
@@ -476,18 +533,24 @@
         }
         
         function handleInput(type, value) {
-            switch(type) {
-                case 'main-text': state.mainText = value; break;
-                case 'note-text': state.noteText = value; break;
-                case 'layout': state.layout = value; break;
-                case 'logo-size': state.logo.size = value; break;
-                case 'logo-visible': state.logo.visible = value; break;
-                case 'main-font': state.main.font = value; break;
-                case 'main-color': state.main.color = value; break;
-                case 'main-font-size': state.main.fontSize = value; break;
-                case 'note-font': state.note.font = value; break;
-                case 'note-color': state.note.color = value; break;
-                case 'note-font-size': state.note.fontSize = value; break;
+            const keys = type.split('-');
+            switch(keys[0]) {
+                case 'main':
+                case 'note':
+                    const target = state[keys[0]];
+                    if (keys[1] === 'bg') { // background properties
+                        target.background[keys[2]] = value;
+                    } else { // font properties
+                        const prop = keys.slice(1).join('');
+                        const finalProp = prop.charAt(0).toLowerCase() + prop.slice(1);
+                        target[finalProp] = value;
+                    }
+                    break;
+                case 'logo':
+                    state.logo[keys[1]] = value;
+                    break;
+                default:
+                    state[type] = value;
             }
             updateAllInputs();
             redrawCanvas();
@@ -501,59 +564,33 @@
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    // Crop image to 1:1 aspect ratio from the center
                     const sourceSize = Math.min(img.width, img.height);
                     const sx = (img.width - sourceSize) / 2;
                     const sy = (img.height - sourceSize) / 2;
-
                     const tempCanvas = document.createElement('canvas');
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCanvas.width = 1024; // Standardize to 1024x1024
+                    tempCanvas.width = 1024;
                     tempCanvas.height = 1024;
-
-                    tempCtx.drawImage(img, sx, sy, sourceSize, sourceSize, 0, 0, 1024, 1024);
-                    
-                    const croppedImageDataUrl = tempCanvas.toDataURL('image/png');
-                    setBackgroundImage(croppedImageDataUrl);
+                    tempCanvas.getContext('2d').drawImage(img, sx, sy, sourceSize, sourceSize, 0, 0, 1024, 1024);
+                    setBackgroundImage(tempCanvas.toDataURL('image/png'));
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        function generateLotusPrompt() {
-            const base = "masterpiece, best quality, beautiful anime style illustration of a lotus flower, scenic, soft lighting, clean lines, square image, buddhist theme, serene, spiritual";
-            const styles = ["on a serene pond at sunrise with mist", "in a mystical zen garden with cinematic light", "minimalist, clean lines, vibrant gold and brown colors", "with a traditional asian temple in the background fog", "glowing softly in a dark, peaceful environment"];
-            return `${base}, ${styles[Math.floor(Math.random() * styles.length)]}`;
-        }
-
-        async function queryStabilityAPI(prompt) {
-            const response = await fetch(`/api/generate-image`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: prompt }),
-            });
-
-            if (!response.ok) {
-                const errorResult = await response.json();
-                throw new Error(`Lỗi từ máy chủ: ${errorResult.error || 'Không rõ lỗi'}`);
-            }
-
-            const responseJSON = await response.json();
-            if (!responseJSON.artifacts || responseJSON.artifacts.length === 0) {
-                 throw new Error('Không nhận được ảnh từ API.');
-            }
-            const imageBase64 = responseJSON.artifacts[0].base64;
-            return `data:image/png;base64,${imageBase64}`;
-        }
-
         async function handleImageGeneration() {
             loadingOverlay.style.display = 'flex';
             try {
-                const prompt = generateLotusPrompt();
-                console.log("Generated Prompt:", prompt);
-                const imageUrl = await queryStabilityAPI(prompt);
-                setBackgroundImage(imageUrl);
+                const prompt = "masterpiece, best quality, beautiful anime style illustration of a lotus flower, scenic, soft lighting, clean lines, square image, buddhist theme, serene, spiritual, on a serene pond at sunrise with mist";
+                const response = await fetch(`/api/generate-image`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt }),
+                });
+                if (!response.ok) throw new Error(`Lỗi từ máy chủ: ${await response.text()}`);
+                const result = await response.json();
+                if (!result.artifacts || result.artifacts.length === 0) throw new Error('Không nhận được ảnh từ API.');
+                setBackgroundImage(`data:image/png;base64,${result.artifacts[0].base64}`);
             } catch (error) {
                 console.error("Image generation failed:", error);
                 alert("Tạo ảnh thất bại: " + error.message);
@@ -584,9 +621,7 @@
             const margin = canvas.width * 0.04;
             let { x, y } = getXY(position, margin, logoSize, logoSize);
             
-            if (position.h === 'right') {
-                x = canvas.width - margin - logoSize;
-            }
+            if (position.h === 'right') x = canvas.width - margin - logoSize;
 
             ctx.drawImage(logoImage, x, y, logoSize, logoSize);
         }
@@ -603,14 +638,34 @@
             const textBlockHeight = lines.length * lineHeight;
             const { x, y, textAlign } = getXY(position, margin, maxWidth, textBlockHeight);
             ctx.textAlign = textAlign;
-            
-            const shadowOffset = Math.max(2, fontSize * 0.04);
 
-            // Draw shadow/background text
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            lines.forEach((line, index) => {
-                ctx.fillText(line, x + shadowOffset, y + shadowOffset + (index * lineHeight));
-            });
+            // Draw background if enabled
+            if (style.background && style.background.visible) {
+                const hexToRgba = (hex, opacity) => {
+                    let r = 0, g = 0, b = 0;
+                    if (hex.length === 7) {
+                        r = parseInt(hex.slice(1, 3), 16);
+                        g = parseInt(hex.slice(3, 5), 16);
+                        b = parseInt(hex.slice(5, 7), 16);
+                    }
+                    return `rgba(${r},${g},${b},${opacity})`;
+                };
+                ctx.fillStyle = hexToRgba(style.background.color, style.background.opacity);
+                const padding = fontSize * 0.2;
+
+                lines.forEach((line, index) => {
+                    const lineWidth = ctx.measureText(line).width;
+                    let rectX;
+                    if (textAlign === 'center') rectX = x - lineWidth / 2 - padding;
+                    else if (textAlign === 'right') rectX = x - lineWidth - padding;
+                    else rectX = x - padding;
+                    
+                    const rectY = y + (index * lineHeight) - (fontSize * 0.9) - padding;
+                    const rectWidth = lineWidth + (padding * 2);
+                    const rectHeight = fontSize + (padding * 2);
+                    ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+                });
+            }
 
             // Draw foreground text
             ctx.fillStyle = style.color;
@@ -632,9 +687,13 @@
                 default: y = (canvas.height / 2) - (blockHeight / 2);
             }
             if (position.v !== 'bottom') {
-                 y += (ctx.measureText('M').width * 1.2);
+                 y += fontSizeFromStyle(position.v === 'top' ? state.main : state.note);
             }
             return { x, y, textAlign };
+        }
+        
+        function fontSizeFromStyle(style) {
+             return (canvas.width / 1024) * style.fontSize;
         }
 
         function wrapText(ctx, text, maxWidth) {
