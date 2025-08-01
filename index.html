@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trợ Lý Thiết Kế V2 - Hoằng Pháp Lợi Sanh</title>
+    <title>Trợ Lý Thiết Kế V3 - Tích hợp AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,6 @@
         }
         .font-display { font-family: 'Playfair Display', serif; }
         
-        /* --- General Component Styling --- */
         .control-panel-section {
             background-color: white;
             border-radius: 12px;
@@ -31,7 +30,6 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* --- Layout Template Selector --- */
         .layout-selector input:checked + label {
             border-color: var(--mau-vang-cam);
             box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
@@ -47,74 +45,58 @@
             align-items: center;
         }
         .layout-preview-box > div {
-            background-color: #D1C4A8;
-            border-radius: 4px;
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 4px;
-            text-align: center;
+            background-color: #D1C4A8; border-radius: 4px; color: white;
+            font-size: 0.6rem; padding: 2px 4px; text-align: center;
         }
-        .layout-preview-box .logo-placeholder {
-            background-color: #A5B4FC;
-            width: 20%;
-            padding: 4px 0;
-        }
-        .layout-preview-box .note-placeholder {
-            background-color: #F87171;
-            width: 40%;
-        }
-        .layout-preview-box .text-placeholder {
-            background-color: #60A5FA;
-            width: 80%;
-            padding: 8px 0;
-        }
+        .layout-preview-box .logo-placeholder { background-color: #A5B4FC; width: 20%; padding: 4px 0; }
+        .layout-preview-box .note-placeholder { background-color: #F87171; width: 40%; }
+        .layout-preview-box .text-placeholder { background-color: #60A5FA; width: 80%; padding: 8px 0; }
 
-        /* --- Mobile Toolbar & Panels --- */
-        #mobile-toolbar {
-            transition: transform 0.3s ease-in-out;
-        }
+        #mobile-toolbar { transition: transform 0.3s ease-in-out; }
         .mobile-panel {
             transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
             visibility: hidden;
         }
-        .mobile-panel.is-open {
-            transform: translateY(0);
-            visibility: visible;
-        }
-        #mobile-toolbar button.active {
-            color: var(--mau-vang-cam);
-            background-color: #FFFBEB;
-        }
+        .mobile-panel.is-open { transform: translateY(0); visibility: visible; }
+        #mobile-toolbar button.active { color: var(--mau-vang-cam); background-color: #FFFBEB; }
 
-        /* --- Accordion Styling --- */
         details > summary { list-style: none; cursor: pointer; }
         details > summary::-webkit-details-marker { display: none; }
         details .accordion-icon { transition: transform 0.3s ease; }
         details[open] .accordion-icon { transform: rotate(90deg); }
+
+        .loader { 
+            border: 5px solid #D1C4A8; border-top: 5px solid #8C5A2B;
+            border-radius: 50%; width: 50px; height: 50px; 
+            animation: spin 1.5s linear infinite; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
 <body class="overflow-x-hidden">
 
     <div class="flex flex-col lg:flex-row min-h-screen">
-        <!-- Left/Main Panel: Image Display Area -->
-        <div id="image-panel" class="w-full lg:w-2/3 bg-gray-200 flex items-center justify-center p-4 lg:p-8">
+        <!-- Image Display Area -->
+        <div id="image-panel" class="w-full lg:w-2/3 bg-gray-200 flex items-center justify-center p-4 lg:p-8 relative">
             <div id="canvas-container" class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
                 <canvas id="resultCanvas" class="w-full h-auto rounded-lg"></canvas>
             </div>
+            <!-- Loading Indicator -->
+            <div id="loading-overlay" class="absolute inset-0 bg-black bg-opacity-50 flex-col items-center justify-center z-20 hidden">
+                <div class="loader"></div>
+                <p class="text-white font-semibold mt-4">Đang tạo ảnh nền, vui lòng chờ...</p>
+            </div>
         </div>
 
-        <!-- Right Panel: Desktop Controls -->
+        <!-- Desktop Controls -->
         <div id="controls-panel" class="hidden lg:block w-full lg:w-1/3 bg-white border-l-4 border-yellow-100 p-8 space-y-6 overflow-y-auto">
             <header class="text-center mb-6">
-                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V2</h1>
-                <p class="text-amber-600 mt-1">Giao diện mới, trải nghiệm mới.</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V3</h1>
+                <p class="text-amber-600 mt-1">Tạo ảnh AI & Tùy chỉnh nâng cao.</p>
             </header>
-            
-            <div id="desktop-controls-content">
-                <!-- Content will be cloned here from mobile panels -->
-            </div>
+            <div id="desktop-controls-content"></div>
              <a id="downloadBtn" href="#" download="thiep-anh-phat-giao.png" class="mt-6 w-full text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 Tải Về Hình Ảnh
@@ -122,34 +104,33 @@
         </div>
     </div>
 
-    <!-- Mobile UI Elements -->
+    <!-- Mobile UI -->
     <div class="lg:hidden">
-        <!-- Mobile Panels (Slide-up menus) -->
         <div id="panels-container" class="fixed inset-0 bg-black bg-opacity-30 z-40" style="visibility: hidden;"></div>
-
+        
+        <div id="image-gen-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
+            <h3 class="font-bold text-lg mb-4 text-center">Bước 1: Tạo Ảnh Nền</h3>
+            <section id="image-gen-controls"></section>
+        </div>
         <div id="layout-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
-            <h3 class="font-bold text-lg mb-4 text-center">Chọn Bố Cục</h3>
-            <section id="layout-controls" class="control-panel-section bg-amber-50">
-                <!-- Layout content will be injected here -->
-            </section>
+            <h3 class="font-bold text-lg mb-4 text-center">Bước 2: Chọn Bố Cục</h3>
+            <section id="layout-controls"></section>
         </div>
-
         <div id="text-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
-             <h3 class="font-bold text-lg mb-4 text-center">Nhập Nội Dung</h3>
-            <section id="text-controls" class="control-panel-section bg-amber-50">
-                <!-- Text content will be injected here -->
-            </section>
+             <h3 class="font-bold text-lg mb-4 text-center">Bước 3: Nhập Nội Dung</h3>
+            <section id="text-controls"></section>
         </div>
-
         <div id="style-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50 overflow-y-auto" style="max-height: 80vh;">
-             <h3 class="font-bold text-lg mb-4 text-center">Tùy Chỉnh Font &amp; Màu</h3>
-            <section id="style-controls" class="space-y-4">
-                <!-- Style content will be injected here -->
-            </section>
+             <h3 class="font-bold text-lg mb-4 text-center">Bước 4: Tùy Chỉnh Font</h3>
+            <section id="style-controls" class="space-y-4"></section>
         </div>
 
         <!-- Mobile Toolbar -->
         <div id="mobile-toolbar" class="fixed bottom-0 left-0 right-0 bg-white h-20 border-t shadow-lg flex justify-around items-center z-50">
+            <button data-panel="image-gen-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <span class="text-xs mt-1">Ảnh Nền</span>
+            </button>
             <button data-panel="layout-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" /></svg>
                 <span class="text-xs mt-1">Bố Cục</span>
@@ -167,32 +148,41 @@
     
     <!-- Templates for cloning -->
     <div id="templates" class="hidden">
-         <div id="template-layout-controls">
-            <h2 class="text-xl font-bold text-amber-900 mb-3">Chọn Bố Cục</h2>
-            <div class="grid grid-cols-3 gap-3 layout-selector" id="layout-selector">
-                <!-- Layout options will be generated here -->
+        <div id="template-image-gen-controls">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 1: Tạo Ảnh Nền</h2>
+            <div class="space-y-4">
+                <p class="text-sm text-amber-700">Bấm nút dưới đây để tạo một ảnh nền ngẫu nhiên theo chủ đề hoa sen Phật giáo.</p>
+                <button id="generate-random-image-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M5.523 13.523a8 8 0 0111.954-2.553M20 20v-5h-5M18.477 10.477a8 8 0 01-11.954 2.553" /></svg>
+                    Tạo Ảnh Nền Ngẫu Nhiên
+                </button>
+            </div>
+        </div>
+        <div id="template-layout-controls">
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 2: Bố Cục & Logo</h2>
+            <div class="grid grid-cols-3 gap-3 layout-selector" id="layout-selector"></div>
+            <div class="mt-4">
+                <label for="logo-size" class="block text-sm font-medium text-amber-800">Kích thước Logo: <span id="logo-size-value">15</span>%</label>
+                <input type="range" id="logo-size" min="5" max="40" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
             </div>
         </div>
         <div id="template-text-controls">
-            <h2 class="text-xl font-bold text-amber-900 mb-3">Nhập Nội Dung</h2>
+            <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 3: Nhập Nội Dung</h2>
             <div class="space-y-4">
                 <div>
                     <label for="text1" class="block text-sm font-medium text-amber-800">Nội dung chính</label>
-                    <textarea id="text1" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Đây là phần nội dung Sư Huynh muốn chèn lên hình ảnh..."></textarea>
+                    <textarea id="text1" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"></textarea>
                 </div>
                 <div>
                     <label for="text3" class="block text-sm font-medium text-amber-800">Ghi chú (Nguồn, ngày tháng...)</label>
-                    <input type="text" id="text3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500" placeholder="Ví dụ: Lời Phật Dạy, Wenda...">
+                    <input type="text" id="text3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500">
                 </div>
             </div>
         </div>
         <div id="template-style-controls">
-             <h2 class="text-xl font-bold text-amber-900 mb-3">Tùy Chỉnh</h2>
+             <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 4: Tùy Chỉnh Font</h2>
              <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
-                <summary class="flex justify-between items-center font-semibold text-amber-900">
-                    Văn Bản Chính
-                    <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                </summary>
+                <summary class="flex justify-between items-center font-semibold text-amber-900">Văn Bản Chính</summary>
                 <div class="mt-4 space-y-5">
                     <div>
                         <label class="font-semibold text-sm text-amber-800">Font chữ</label>
@@ -205,10 +195,7 @@
                 </div>
             </details>
             <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition">
-                <summary class="flex justify-between items-center font-semibold text-amber-900">
-                    Ghi Chú
-                    <svg class="w-5 h-5 accordion-icon text-amber-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                </summary>
+                <summary class="flex justify-between items-center font-semibold text-amber-900">Ghi Chú</summary>
                  <div class="mt-4 space-y-5">
                     <div>
                         <label class="font-semibold text-sm text-amber-800">Font chữ</label>
@@ -223,47 +210,21 @@
         </div>
     </div>
 
-
     <script type="module">
         // --- STATE & CONFIGURATION ---
         const state = {
             mainText: "Lời hay ý đẹp từ kinh sách, mang lại sự an lạc và trí tuệ.",
             noteText: "Nguồn: Lời Phật Dạy",
             layout: 'layout1',
-            main: {
-                font: 'Playfair Display',
-                color: '#FFFFFF',
-                size: 50, // Relative size
-            },
-            note: {
-                font: 'Roboto',
-                color: '#FFFFFF',
-                size: 20, // Relative size
-            },
-            logo: {
-                size: 15, // Percentage of canvas width
-            }
+            main: { font: 'Playfair Display', color: '#FFFFFF', size: 50 },
+            note: { font: 'Roboto', color: '#FFFFFF', size: 20 },
+            logo: { size: 15 }
         };
 
         const layouts = {
-            layout1: {
-                name: 'Cổ Điển',
-                main: { v: 'top', h: 'center' },
-                logo: { v: 'bottom', h: 'left' },
-                note: { v: 'bottom', h: 'right' },
-            },
-            layout2: {
-                name: 'Hiện Đại',
-                main: { v: 'center', h: 'center' },
-                logo: { v: 'top', h: 'left' },
-                note: { v: 'bottom', h: 'right' },
-            },
-            layout3: {
-                name: 'Phá Cách',
-                main: { v: 'bottom', h: 'center' },
-                logo: { v: 'top', h: 'right' },
-                note: { v: 'top', h: 'left' },
-            }
+            layout1: { name: 'Cổ Điển', main: { v: 'top', h: 'center' }, logo: { v: 'bottom', h: 'left' }, note: { v: 'bottom', h: 'right' } },
+            layout2: { name: 'Hiện Đại', main: { v: 'center', h: 'center' }, logo: { v: 'top', h: 'left' }, note: { v: 'bottom', h: 'right' } },
+            layout3: { name: 'Phá Cách', main: { v: 'bottom', h: 'center' }, logo: { v: 'top', h: 'right' }, note: { v: 'top', h: 'left' } }
         };
 
         const fontProfiles = [ 'Roboto', 'Be Vietnam Pro', 'Playfair Display', 'Times New Roman', 'Arial' ];
@@ -273,6 +234,7 @@
         const canvas = document.getElementById('resultCanvas');
         const ctx = canvas.getContext('2d');
         const downloadBtn = document.getElementById('downloadBtn');
+        const loadingOverlay = document.getElementById('loading-overlay');
         
         const logoImage = new Image();
         const backgroundImage = new Image();
@@ -283,113 +245,86 @@
         function init() {
             cloneControls();
             setupEventListeners();
-            loadAssets();
+            loadInitialAssets();
             generateUIComponents();
             updateAllInputs();
+            handleImageGeneration(); // Load an initial random image on startup
         }
         
         function cloneControls() {
             const desktopContainer = document.getElementById('desktop-controls-content');
-            const mobileLayoutContainer = document.getElementById('layout-controls');
-            const mobileTextContainer = document.getElementById('text-controls');
-            const mobileStyleContainer = document.getElementById('style-controls');
+            const containers = {
+                'image-gen-controls': document.getElementById('template-image-gen-controls'),
+                'layout-controls': document.getElementById('template-layout-controls'),
+                'text-controls': document.getElementById('template-text-controls'),
+                'style-controls': document.getElementById('template-style-controls'),
+            };
 
-            const layoutContent = document.getElementById('template-layout-controls').cloneNode(true);
-            const textContent = document.getElementById('template-text-controls').cloneNode(true);
-            const styleContent = document.getElementById('template-style-controls').cloneNode(true);
-
-            // For mobile
-            mobileLayoutContainer.appendChild(layoutContent.cloneNode(true));
-            mobileTextContainer.appendChild(textContent.cloneNode(true));
-            mobileStyleContainer.appendChild(styleContent.cloneNode(true));
-            
-            // For desktop
-            desktopContainer.appendChild(layoutContent);
-            desktopContainer.appendChild(textContent);
-            desktopContainer.appendChild(styleContent);
+            for (const key in containers) {
+                // Mobile
+                document.getElementById(key).appendChild(containers[key].cloneNode(true));
+                // Desktop
+                desktopContainer.appendChild(containers[key]);
+            }
         }
 
-        async function loadAssets() {
-            // Load fonts
-            try {
-                const fontChecks = fontProfiles.map(font => document.fonts.load(`700 12px "${font}"`));
-                await Promise.all(fontChecks);
-                console.log("Fonts loaded");
-                areFontsLoaded = true;
-            } catch (err) {
-                console.error("Font loading error:", err);
-            }
-
-            // Load logo
-            logoImage.src = 'logo.png'; // Make sure logo.png is in the same folder
-            logoImage.onload = () => {
-                console.log("Logo loaded");
-                isLogoLoaded = true;
-                redrawCanvas();
-            };
-            logoImage.onerror = () => {
-                console.warn("logo.png not found. The logo will not be displayed.");
-                isLogoLoaded = false;
-                redrawCanvas();
-            };
-
-            // Load background
+        async function loadInitialAssets() {
+            const fontChecks = fontProfiles.map(font => document.fonts.load(`700 12px "${font}"`));
+            const logoPromise = new Promise(resolve => {
+                logoImage.src = 'logo.png';
+                logoImage.onload = () => { isLogoLoaded = true; resolve(); };
+                logoImage.onerror = () => { console.warn("logo.png not found."); isLogoLoaded = false; resolve(); };
+            });
+            
+            await Promise.all([...fontChecks, logoPromise]);
+            areFontsLoaded = true;
+            console.log("Fonts and logo loaded.");
+            redrawCanvas();
+        }
+        
+        function setBackgroundImage(src) {
             backgroundImage.crossOrigin = "anonymous";
-            backgroundImage.src = 'https://placehold.co/1024x1024/8C5A2B/FDF8E1?text=Nen+Anh';
+            backgroundImage.src = src;
             backgroundImage.onload = () => {
-                console.log("Background loaded");
                 canvas.width = backgroundImage.width;
                 canvas.height = backgroundImage.height;
                 redrawCanvas();
+                loadingOverlay.style.display = 'none';
             };
             backgroundImage.onerror = () => {
-                console.error("Could not load background image.");
-                // Draw a fallback background
-                canvas.width = 1024;
-                canvas.height = 1024;
-                ctx.fillStyle = '#FDF8E1';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#422006';
-                ctx.textAlign = 'center';
-                ctx.fillText("Lỗi tải ảnh nền", canvas.width / 2, canvas.height / 2);
+                alert("Lỗi khi tải ảnh nền.");
+                loadingOverlay.style.display = 'none';
             };
         }
 
         function generateUIComponents() {
-            // Layout Selector
             const layoutContainer = document.getElementById('layout-selector');
             for (const key in layouts) {
                 const layout = layouts[key];
-                const checked = key === state.layout ? 'checked' : '';
                 layoutContainer.innerHTML += `
                     <div>
-                        <input type="radio" name="layout" id="${key}" value="${key}" class="hidden" ${checked}>
+                        <input type="radio" name="layout" id="${key}" value="${key}" class="hidden">
                         <label for="${key}" class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
-                            <div class="layout-preview-box">
-                                ${generateLayoutPreview(layout)}
-                            </div>
+                            <div class="layout-preview-box">${generateLayoutPreview(layout)}</div>
                             <span class="text-sm font-semibold mt-2 block">${layout.name}</span>
                         </label>
-                    </div>
-                `;
+                    </div>`;
             }
 
-            // Font & Color Selectors
             const createSelector = (containerId, items, name, stateKey, stateSubKey) => {
-                const container = document.querySelectorAll(`#${containerId}`);
+                const containers = document.querySelectorAll(`#${containerId}`);
                 let content = '';
                 items.forEach((item, index) => {
-                    const isChecked = item === state[stateKey][stateSubKey];
                     const id = `${name}-${index}`;
                     content += `
                         <div>
-                            <input type="radio" name="${name}" id="${id}" value="${item}" class="hidden" ${isChecked ? 'checked' : ''}>
+                            <input type="radio" name="${name}" id="${id}" value="${item}" class="hidden">
                             <label for="${id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${containerId.includes('color') ? `background-color:${item}` : `font-family:'${item}'`}">
                                 ${containerId.includes('color') ? '&nbsp;' : item}
                             </label>
                         </div>`;
                 });
-                container.forEach(c => c.innerHTML = content);
+                containers.forEach(c => c.innerHTML = content);
             };
             
             createSelector('main-font-selector', fontProfiles, 'main-font', 'main', 'font');
@@ -400,17 +335,11 @@
 
         function generateLayoutPreview(layout) {
             const positions = { top: '', center: '', bottom: ''};
-            const addElement = (pos, type) => `<div class="${type}-placeholder">${type.charAt(0).toUpperCase()}</div>`;
-
-            positions[layout.main.v] += addElement(layout.main.v, 'text');
-            positions[layout.logo.v] += addElement(layout.logo.v, 'logo');
-            positions[layout.note.v] += addElement(layout.note.v, 'note');
-            
-            return `
-                <div class="flex justify-around w-full">${positions.top}</div>
-                <div class="flex justify-around w-full">${positions.center}</div>
-                <div class="flex justify-around w-full">${positions.bottom}</div>
-            `;
+            const addElement = (type) => `<div class="${type}-placeholder">${type.charAt(0).toUpperCase()}</div>`;
+            positions[layout.main.v] += addElement('text');
+            positions[layout.logo.v] += addElement('logo');
+            positions[layout.note.v] += addElement('note');
+            return `<div class="flex justify-around w-full">${positions.top}</div><div class="flex justify-around w-full">${positions.center}</div><div class="flex justify-around w-full">${positions.bottom}</div>`;
         }
         
         function updateAllInputs() {
@@ -421,13 +350,20 @@
             document.querySelectorAll(`input[name="note-font"][value="${state.note.font}"]`).forEach(el => el.checked = true);
             document.querySelectorAll(`input[name="main-color"][value="${state.main.color}"]`).forEach(el => el.checked = true);
             document.querySelectorAll(`input[name="note-color"][value="${state.note.color}"]`).forEach(el => el.checked = true);
+            document.querySelectorAll('#logo-size').forEach(el => el.value = state.logo.size);
+            document.querySelectorAll('#logo-size-value').forEach(el => el.textContent = state.logo.size);
         }
 
         // --- EVENT HANDLING ---
         function setupEventListeners() {
-            // Use event delegation for controls that exist in multiple places
             document.body.addEventListener('input', handleInput);
             document.body.addEventListener('change', handleInput);
+            document.body.addEventListener('click', (e) => {
+                // Find the closest button with the ID, works with event delegation
+                if (e.target.closest('#generate-random-image-btn')) {
+                    handleImageGeneration();
+                }
+            });
 
             // Mobile panel controls
             const mobileToolBtns = document.querySelectorAll('.mobile-tool-btn');
@@ -437,9 +373,7 @@
                     const panelId = btn.dataset.panel;
                     const panel = document.getElementById(panelId);
                     const isOpen = panel.classList.contains('is-open');
-
                     closeAllPanels();
-                    
                     if (!isOpen) {
                         panel.classList.add('is-open');
                         panelsContainer.style.visibility = 'visible';
@@ -449,7 +383,6 @@
             });
             panelsContainer.addEventListener('click', closeAllPanels);
             
-            // Download button
             downloadBtn.addEventListener('click', () => {
                 downloadBtn.href = canvas.toDataURL('image/png');
             });
@@ -459,9 +392,13 @@
             const target = e.target;
             const name = target.name;
             const value = target.value;
-
+            
             if (target.id === 'text1') state.mainText = value;
             if (target.id === 'text3') state.noteText = value;
+            if (target.id === 'logo-size') {
+                state.logo.size = value;
+                document.querySelectorAll('#logo-size-value').forEach(el => el.textContent = value);
+            }
             if (name === 'layout') state.layout = value;
             if (name === 'main-font') state.main.font = value;
             if (name === 'note-font') state.note.font = value;
@@ -476,42 +413,66 @@
             document.querySelectorAll('.mobile-tool-btn.active').forEach(b => b.classList.remove('active'));
             document.getElementById('panels-container').style.visibility = 'hidden';
         }
+        
+        // --- IMAGE GENERATION ---
+        function generateLotusPrompt() {
+            const base = "masterpiece, best quality, beautiful anime style illustration of a lotus flower, scenic, soft lighting, clean lines, square image, buddhist theme, serene, spiritual";
+            const styles = ["on a serene pond at sunrise with mist", "in a mystical zen garden with cinematic light", "minimalist, clean lines, vibrant gold and brown colors", "with a traditional asian temple in the background fog", "glowing softly in a dark, peaceful environment"];
+            return `${base}, ${styles[Math.floor(Math.random() * styles.length)]}`;
+        }
+
+        async function queryStabilityAPI(prompt) {
+            // This function calls your own server, which then calls Stability AI
+            const response = await fetch(`/api/generate-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt }),
+            });
+
+            if (!response.ok) {
+                const errorResult = await response.json();
+                throw new Error(`Lỗi từ máy chủ: ${errorResult.error || 'Không rõ lỗi'}`);
+            }
+
+            const responseJSON = await response.json();
+            if (!responseJSON.artifacts || responseJSON.artifacts.length === 0) {
+                 throw new Error('Không nhận được ảnh từ API.');
+            }
+            const imageBase64 = responseJSON.artifacts[0].base64;
+            return `data:image/png;base64,${imageBase64}`;
+        }
+
+        async function handleImageGeneration() {
+            loadingOverlay.style.display = 'flex';
+            try {
+                const prompt = generateLotusPrompt();
+                console.log("Generated Prompt:", prompt);
+                const imageUrl = await queryStabilityAPI(prompt);
+                setBackgroundImage(imageUrl);
+            } catch (error) {
+                console.error("Image generation failed:", error);
+                alert("Tạo ảnh thất bại: " + error.message);
+                loadingOverlay.style.display = 'none';
+            }
+        }
 
         // --- DRAWING ENGINE ---
         function redrawCanvas() {
-            if (!backgroundImage.complete || !areFontsLoaded) {
-                // Don't draw if assets aren't ready, except for logo error case
-                if(!isLogoLoaded && !logoImage.src.endsWith('logo.png')) return;
-            }
+            if (!backgroundImage.complete || !areFontsLoaded) return;
             
-            // 1. Clear and draw background
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
             const currentLayout = layouts[state.layout];
-
-            // 2. Draw Logo
-            if (isLogoLoaded) {
-                drawLogo(currentLayout.logo);
-            }
-
-            // 3. Draw Main Text
-            if (state.mainText.trim()) {
-                drawText(state.mainText, state.main, currentLayout.main);
-            }
-
-            // 4. Draw Note Text
-            if (state.noteText.trim()) {
-                drawText(state.noteText, state.note, currentLayout.note);
-            }
+            if (isLogoLoaded) drawLogo(currentLayout.logo);
+            if (state.mainText.trim()) drawText(state.mainText, state.main, currentLayout.main);
+            if (state.noteText.trim()) drawText(state.noteText, state.note, currentLayout.note);
         }
         
         function drawLogo(position) {
             const logoSize = canvas.width * (state.logo.size / 100);
             const margin = canvas.width * 0.04;
-            
             const pos = getXY(position, margin, logoSize, logoSize);
-            
             ctx.drawImage(logoImage, pos.x, pos.y, logoSize, logoSize);
         }
 
@@ -522,8 +483,6 @@
             
             ctx.font = `bold ${fontSize}px "${style.font}"`;
             ctx.fillStyle = style.color;
-            
-            // Text shadow for better readability
             ctx.shadowColor = 'rgba(0,0,0,0.5)';
             ctx.shadowBlur = 8;
             ctx.shadowOffsetX = 2;
@@ -532,74 +491,45 @@
             const lines = wrapText(ctx, text, maxWidth);
             const lineHeight = fontSize * 1.3;
             const textBlockHeight = lines.length * lineHeight;
-
             const pos = getXY(position, margin, maxWidth, textBlockHeight);
 
             ctx.textAlign = pos.textAlign;
-            
-            lines.forEach((line, index) => {
-                ctx.fillText(line, pos.x, pos.y + (index * lineHeight));
-            });
-            
-            // Reset shadow
+            lines.forEach((line, index) => ctx.fillText(line, pos.x, pos.y + (index * lineHeight)));
             ctx.shadowColor = 'transparent';
         }
 
         function getXY(position, margin, blockWidth, blockHeight) {
             let x, y, textAlign;
-
-            // Horizontal
             switch(position.h) {
-                case 'left':
-                    x = margin;
-                    textAlign = 'left';
-                    break;
-                case 'right':
-                    x = canvas.width - margin;
-                    textAlign = 'right';
-                    break;
-                case 'center':
-                default:
-                    x = canvas.width / 2;
-                    textAlign = 'center';
+                case 'left': x = margin; textAlign = 'left'; break;
+                case 'right': x = canvas.width - margin; textAlign = 'right'; break;
+                default: x = canvas.width / 2; textAlign = 'center';
             }
-
-            // Vertical
             switch(position.v) {
-                case 'top':
-                    y = margin;
-                    break;
-                case 'bottom':
-                    y = canvas.height - margin - blockHeight;
-                    break;
-                case 'center':
-                default:
-                    y = (canvas.height / 2) - (blockHeight / 2);
+                case 'top': y = margin; break;
+                case 'bottom': y = canvas.height - margin - blockHeight; break;
+                default: y = (canvas.height / 2) - (blockHeight / 2);
             }
-            
-            // For text drawing, textBaseline is top
             if (position.v !== 'bottom') {
-                 y += (ctx.measureText('M').width * 1.2); // approximation of line height
+                 y += (ctx.measureText('M').width * 1.2);
             }
-
-
             return { x, y, textAlign };
         }
 
         function wrapText(ctx, text, maxWidth) {
             const finalLines = [];
-            const paragraphs = text.split('\n');
-            paragraphs.forEach(p => {
+            text.split('\n').forEach(p => {
+                let currentLine = '';
                 const words = p.split(' ');
-                let currentLine = words[0] || '';
-                for (let i = 1; i < words.length; i++) {
-                    const word = words[i];
-                    const testLine = currentLine + " " + word;
-                    if (ctx.measureText(testLine).width < maxWidth) {
-                        currentLine = testLine;
-                    } else {
-                        finalLines.push(currentLine);
-                        currentLine = word;
+                if (words.length > 0) {
+                    currentLine = words[0];
+                    for (let i = 1; i < words.length; i++) {
+                        if (ctx.measureText(currentLine + " " + words[i]).width < maxWidth) {
+                            currentLine += " " + words[i];
+                        } else {
+                            finalLines.push(currentLine);
+                            currentLine = words[i];
+                        }
                     }
                 }
                 finalLines.push(currentLine);
@@ -607,7 +537,6 @@
             return finalLines;
         }
 
-        // --- START THE APP ---
         init();
     </script>
 </body>
