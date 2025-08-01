@@ -30,6 +30,11 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
+        .choice-selector input:checked + label {
+            border-color: var(--mau-vang-cam);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
+            background-color: #FFFBEB;
+        }
         .layout-selector input:checked + label {
             border-color: var(--mau-vang-cam);
             box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
@@ -172,7 +177,7 @@
             <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 2: Bố Cục & Logo</h2>
             <div class="space-y-4">
                 <h3 class="text-lg font-semibold text-amber-900">Chọn Mẫu Bố Cục</h3>
-                <div class="grid grid-cols-3 gap-3 layout-selector" id="layout-selector"></div>
+                <div class="grid grid-cols-3 gap-3 layout-selector"></div>
                 <div class="mt-4 pt-4 border-t">
                     <label for="logo-size" class="block text-sm font-medium text-amber-800">Kích thước Logo: <span id="logo-size-value">15</span>%</label>
                     <input type="range" id="logo-size" min="5" max="40" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
@@ -200,14 +205,14 @@
                     <div class="mt-4 space-y-5">
                         <div>
                             <label class="font-semibold text-sm text-amber-800">Font chữ</label>
-                            <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="main-font-selector"></div>
+                            <div class="grid grid-cols-2 gap-2 choice-selector main-font-selector"></div>
                         </div>
                         <div>
                             <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
-                            <div class="grid grid-cols-5 gap-2 choice-selector mt-3" id="main-color-selector"></div>
+                            <div class="grid grid-cols-5 gap-2 choice-selector main-color-selector"></div>
                         </div>
                         <div>
-                             <label for="main-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span id="main-font-size-value">50</span></label>
+                             <label for="main-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span class="main-font-size-value">50</span></label>
                              <input type="range" id="main-font-size" min="10" max="120" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
@@ -217,14 +222,14 @@
                      <div class="mt-4 space-y-5">
                         <div>
                             <label class="font-semibold text-sm text-amber-800">Font chữ</label>
-                            <div class="grid grid-cols-2 gap-2 choice-selector mt-2" id="note-font-selector"></div>
+                            <div class="grid grid-cols-2 gap-2 choice-selector note-font-selector"></div>
                         </div>
                         <div>
                             <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
-                            <div class="grid grid-cols-5 gap-2 choice-selector mt-3" id="note-color-selector"></div>
+                            <div class="grid grid-cols-5 gap-2 choice-selector note-color-selector"></div>
                         </div>
                         <div>
-                             <label for="note-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span id="note-font-size-value">20</span></label>
+                             <label for="note-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span class="note-font-size-value">20</span></label>
                              <input type="range" id="note-font-size" min="10" max="60" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                         </div>
                      </div>
@@ -267,9 +272,9 @@
         // --- INITIALIZATION ---
         function init() {
             cloneControls();
+            generateUIComponents();
             setupEventListeners();
             loadInitialAssets();
-            generateUIComponents();
             updateAllInputs();
             handleImageGeneration();
         }
@@ -339,8 +344,8 @@
                 }
             });
 
-            const createSelector = (containerId, items, name) => {
-                document.querySelectorAll(`#${containerId}`).forEach(container => {
+            const createSelector = (selectorClass, items, name) => {
+                document.querySelectorAll(`.${selectorClass}`).forEach(container => {
                     const parentId = container.closest('.mobile-panel, #controls-panel').id;
                     container.innerHTML = '';
                     let content = '';
@@ -349,8 +354,8 @@
                         content += `
                             <div>
                                 <input type="radio" name="${name}-${parentId}" id="${radioId}" value="${item}" class="hidden">
-                                <label for="${radioId}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${containerId.includes('color') ? `background-color:${item}` : `font-family:'${item}'`}">
-                                    ${containerId.includes('color') ? '&nbsp;' : item}
+                                <label for="${radioId}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${selectorClass.includes('color') ? `background-color:${item}` : `font-family:'${item}'`}">
+                                    ${selectorClass.includes('color') ? '&nbsp;' : item}
                                 </label>
                             </div>`;
                     });
@@ -388,9 +393,9 @@
             document.querySelectorAll('input[id^="logo-size"]').forEach(el => el.value = state.logo.size);
             document.querySelectorAll('span[id^="logo-size-value"]').forEach(el => el.textContent = state.logo.size);
             document.querySelectorAll('input[id^="main-font-size"]').forEach(el => el.value = state.main.fontSize);
-            document.querySelectorAll('span[id^="main-font-size-value"]').forEach(el => el.textContent = state.main.fontSize);
+            document.querySelectorAll('span.main-font-size-value').forEach(el => el.textContent = state.main.fontSize);
             document.querySelectorAll('input[id^="note-font-size"]').forEach(el => el.value = state.note.fontSize);
-            document.querySelectorAll('span[id^="note-font-size-value"]').forEach(el => el.textContent = state.note.fontSize);
+            document.querySelectorAll('span.note-font-size-value').forEach(el => el.textContent = state.note.fontSize);
         }
 
         // --- EVENT HANDLING ---
@@ -443,11 +448,11 @@
             if (target.id.includes('logo-size')) state.logo.size = value;
             if (target.id.includes('main-font-size')) state.main.fontSize = value;
             if (target.id.includes('note-font-size')) state.note.fontSize = value;
-            if (name.includes('layout')) state.layout = value;
-            if (name.includes('main-font')) state.main.font = value;
-            if (name.includes('note-font')) state.note.font = value;
-            if (name.includes('main-color')) state.main.color = value;
-            if (name.includes('note-color')) state.note.color = value;
+            if (name && name.includes('layout')) state.layout = value;
+            if (name && name.includes('main-font')) state.main.font = value;
+            if (name && name.includes('note-font')) state.note.font = value;
+            if (name && name.includes('main-color')) state.main.color = value;
+            if (name && name.includes('note-color')) state.note.color = value;
 
             updateAllInputs();
             redrawCanvas();
@@ -526,7 +531,7 @@
         }
 
         function drawText(text, style, position) {
-            const fontSize = (canvas.width / 1024) * style.fontSize; // Scale font size with canvas
+            const fontSize = (canvas.width / 1024) * style.fontSize;
             const margin = canvas.width * 0.04;
             const maxWidth = canvas.width - (margin * 2);
             
