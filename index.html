@@ -77,7 +77,7 @@
 
     </style>
 </head>
-<body class="overflow-hidden">
+<body>
 
     <!-- Desktop UI -->
     <div class="hidden lg:flex flex-col lg:flex-row min-h-screen">
@@ -593,20 +593,30 @@
             const maxWidth = canvas.width - (margin * 2);
             
             ctx.font = `bold ${fontSize}px "${style.font}"`;
-            ctx.fillStyle = style.color;
+            
+            const lines = wrapText(ctx, text, maxWidth);
+            const lineHeight = fontSize * 1.3;
+            const textBlockHeight = lines.length * lineHeight;
+            const { x, y, textAlign } = getXY(position, margin, maxWidth, textBlockHeight);
+            ctx.textAlign = textAlign;
+
+            // Draw background/shadow
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
             ctx.shadowColor = 'rgba(0,0,0,0.5)';
             ctx.shadowBlur = 8;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 2;
+            lines.forEach((line, index) => {
+                ctx.fillText(line, x, y + (index * lineHeight));
+            });
+            ctx.restore();
 
-            const lines = wrapText(ctx, text, maxWidth);
-            const lineHeight = fontSize * 1.3;
-            const textBlockHeight = lines.length * lineHeight;
-            const pos = getXY(position, margin, maxWidth, textBlockHeight);
-
-            ctx.textAlign = pos.textAlign;
-            lines.forEach((line, index) => ctx.fillText(line, pos.x, pos.y + (index * lineHeight)));
-            ctx.shadowColor = 'transparent';
+            // Draw foreground text
+            ctx.fillStyle = style.color;
+            lines.forEach((line, index) => {
+                ctx.fillText(line, x, y + (index * lineHeight));
+            });
         }
 
         function getXY(position, margin, blockWidth, blockHeight) {
