@@ -17,6 +17,8 @@
         }
         html, body {
             overscroll-behavior: none;
+            height: 100%;
+            overflow: hidden;
         }
         body { 
             font-family: 'Be Vietnam Pro', sans-serif; 
@@ -80,8 +82,8 @@
 <body>
 
     <!-- Desktop UI -->
-    <div class="hidden lg:flex flex-col lg:flex-row min-h-screen">
-        <div class="w-full lg:w-2/3 bg-gray-200 flex items-center justify-center p-4 lg:p-8 relative">
+    <div class="hidden lg:flex h-screen">
+        <div class="w-2/3 bg-gray-200 flex items-center justify-center p-8 relative">
             <div id="canvas-container" class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
                 <canvas id="resultCanvas" class="w-full h-auto rounded-lg"></canvas>
             </div>
@@ -90,13 +92,15 @@
                 <p class="text-white font-semibold mt-4">Đang xử lý, vui lòng chờ...</p>
             </div>
         </div>
-        <div id="desktop-controls-panel" class="w-full lg:w-1/3 bg-white border-l-4 border-yellow-100 p-8 space-y-6 overflow-y-auto">
-            <header class="text-center mb-6">
-                <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V6</h1>
-                <p class="text-amber-600 mt-1">Giao diện hoàn thiện, trải nghiệm tối ưu.</p>
-            </header>
-            <div id="desktop-controls-content" class="space-y-6"></div>
-             <a id="downloadBtn" href="#" download="thiep-anh-phat-giao.png" class="mt-6 w-full text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+        <div class="w-1/3 bg-white border-l-4 border-yellow-100 flex flex-col">
+            <div id="desktop-controls-panel" class="flex-grow p-8 space-y-6 overflow-y-auto">
+                <header class="text-center mb-6">
+                    <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V6</h1>
+                    <p class="text-amber-600 mt-1">Giao diện hoàn thiện, trải nghiệm tối ưu.</p>
+                </header>
+                <div id="desktop-controls-content" class="space-y-6"></div>
+            </div>
+             <a id="downloadBtn" href="#" download="thiep-anh-phat-giao.png" class="flex-shrink-0 m-8 w-auto text-center bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-4 px-4 rounded-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 Tải Về Hình Ảnh
             </a>
@@ -599,18 +603,14 @@
             const textBlockHeight = lines.length * lineHeight;
             const { x, y, textAlign } = getXY(position, margin, maxWidth, textBlockHeight);
             ctx.textAlign = textAlign;
+            
+            const shadowOffset = Math.max(2, fontSize * 0.04);
 
-            // Draw background/shadow
-            ctx.save();
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
+            // Draw shadow/background text
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
             lines.forEach((line, index) => {
-                ctx.fillText(line, x, y + (index * lineHeight));
+                ctx.fillText(line, x + shadowOffset, y + shadowOffset + (index * lineHeight));
             });
-            ctx.restore();
 
             // Draw foreground text
             ctx.fillStyle = style.color;
