@@ -64,7 +64,7 @@
         .mobile-panel.is-open { transform: translateY(0); visibility: visible; }
         .mobile-panel-content {
             overflow-y: auto;
-            padding: 0.25rem; /* Add some padding for scrollbar */
+            padding: 0.25rem;
         }
         #mobile-toolbar button.active { color: var(--mau-vang-cam); background-color: #FFFBEB; }
 
@@ -206,6 +206,10 @@
                             <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
                             <div class="grid grid-cols-5 gap-2 choice-selector mt-3" id="main-color-selector"></div>
                         </div>
+                        <div>
+                             <label for="main-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span id="main-font-size-value">50</span></label>
+                             <input type="range" id="main-font-size" min="10" max="120" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
                     </div>
                 </details>
                 <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
@@ -219,7 +223,11 @@
                             <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
                             <div class="grid grid-cols-5 gap-2 choice-selector mt-3" id="note-color-selector"></div>
                         </div>
-                    </div>
+                        <div>
+                             <label for="note-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span id="note-font-size-value">20</span></label>
+                             <input type="range" id="note-font-size" min="10" max="60" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                     </div>
                 </details>
             </div>
         </div>
@@ -231,8 +239,8 @@
             mainText: "Lời hay ý đẹp từ kinh sách, mang lại sự an lạc và trí tuệ.",
             noteText: "Nguồn: Lời Phật Dạy",
             layout: 'layout1',
-            main: { font: 'Playfair Display', color: '#FFFFFF', size: 50 },
-            note: { font: 'Roboto', color: '#FFFFFF', size: 20 },
+            main: { font: 'Playfair Display', color: '#FFFFFF', fontSize: 50 },
+            note: { font: 'Roboto', color: '#FFFFFF', fontSize: 20 },
             logo: { size: 15 }
         };
 
@@ -263,7 +271,7 @@
             loadInitialAssets();
             generateUIComponents();
             updateAllInputs();
-            handleImageGeneration(); // Load an initial random image on startup
+            handleImageGeneration();
         }
         
         function cloneControls() {
@@ -277,9 +285,7 @@
 
             for (const key in templates) {
                 const templateNode = templates[key];
-                // Mobile
                 document.getElementById(key).appendChild(templateNode.cloneNode(true));
-                // Desktop
                 desktopContainer.appendChild(templateNode.cloneNode(true));
             }
         }
@@ -333,7 +339,7 @@
                 }
             });
 
-            const createSelector = (containerId, items, name, stateKey, stateSubKey) => {
+            const createSelector = (containerId, items, name) => {
                 document.querySelectorAll(`#${containerId}`).forEach(container => {
                     const parentId = container.closest('.mobile-panel, #controls-panel').id;
                     container.innerHTML = '';
@@ -352,10 +358,10 @@
                 });
             };
             
-            createSelector('main-font-selector', fontProfiles, 'main-font', 'main', 'font');
-            createSelector('note-font-selector', fontProfiles, 'note-font', 'note', 'font');
-            createSelector('main-color-selector', colorProfiles, 'main-color', 'main', 'color');
-            createSelector('note-color-selector', colorProfiles, 'note-color', 'note', 'color');
+            createSelector('main-font-selector', fontProfiles, 'main-font');
+            createSelector('note-font-selector', fontProfiles, 'note-font');
+            createSelector('main-color-selector', colorProfiles, 'main-color');
+            createSelector('note-color-selector', colorProfiles, 'note-color');
         }
 
         function generateLayoutPreview(layout) {
@@ -372,15 +378,19 @@
             document.querySelectorAll('input[id^="text3"]').forEach(el => el.value = state.noteText);
             
             document.querySelectorAll(`input[type="radio"]`).forEach(el => {
-                if (el.name.startsWith('layout')) el.checked = el.value === state.layout;
-                if (el.name.startsWith('main-font')) el.checked = el.value === state.main.font;
-                if (el.name.startsWith('note-font')) el.checked = el.value === state.note.font;
-                if (el.name.startsWith('main-color')) el.checked = el.value === state.main.color;
-                if (el.name.startsWith('note-color')) el.checked = el.value === state.note.color;
+                if (el.name.includes('layout')) el.checked = el.value === state.layout;
+                if (el.name.includes('main-font')) el.checked = el.value === state.main.font;
+                if (el.name.includes('note-font')) el.checked = el.value === state.note.font;
+                if (el.name.includes('main-color')) el.checked = el.value === state.main.color;
+                if (el.name.includes('note-color')) el.checked = el.value === state.note.color;
             });
             
             document.querySelectorAll('input[id^="logo-size"]').forEach(el => el.value = state.logo.size);
             document.querySelectorAll('span[id^="logo-size-value"]').forEach(el => el.textContent = state.logo.size);
+            document.querySelectorAll('input[id^="main-font-size"]').forEach(el => el.value = state.main.fontSize);
+            document.querySelectorAll('span[id^="main-font-size-value"]').forEach(el => el.textContent = state.main.fontSize);
+            document.querySelectorAll('input[id^="note-font-size"]').forEach(el => el.value = state.note.fontSize);
+            document.querySelectorAll('span[id^="note-font-size-value"]').forEach(el => el.textContent = state.note.fontSize);
         }
 
         // --- EVENT HANDLING ---
@@ -401,7 +411,7 @@
             mobileToolBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const panelId = btn.dataset.panel;
-                    if (!panelId) return; // For download button
+                    if (!panelId) return;
                     const panel = document.getElementById(panelId);
                     const isOpen = panel.classList.contains('is-open');
                     closeAllPanels();
@@ -431,6 +441,8 @@
             if (target.id.includes('text1')) state.mainText = value;
             if (target.id.includes('text3')) state.noteText = value;
             if (target.id.includes('logo-size')) state.logo.size = value;
+            if (target.id.includes('main-font-size')) state.main.fontSize = value;
+            if (target.id.includes('note-font-size')) state.note.fontSize = value;
             if (name.includes('layout')) state.layout = value;
             if (name.includes('main-font')) state.main.font = value;
             if (name.includes('note-font')) state.note.font = value;
@@ -514,7 +526,7 @@
         }
 
         function drawText(text, style, position) {
-            const fontSize = canvas.width * (style.size / 1000);
+            const fontSize = (canvas.width / 1024) * style.fontSize; // Scale font size with canvas
             const margin = canvas.width * 0.04;
             const maxWidth = canvas.width - (margin * 2);
             
