@@ -67,6 +67,7 @@
         .mobile-panel-content {
             overflow-y: auto;
             padding: 0.25rem;
+            flex-grow: 1; /* Fix for scrolling */
         }
         #mobile-toolbar button.active { color: var(--mau-vang-cam); background-color: #FFFBEB; }
 
@@ -162,7 +163,7 @@
             <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 1: Tạo Ảnh Nền</h2>
             <div class="space-y-4">
                 <p class="text-sm text-amber-700">Bấm nút dưới đây để tạo một ảnh nền ngẫu nhiên theo chủ đề hoa sen Phật giáo.</p>
-                <button id="generate-random-image-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2">
+                <button data-action="generate-image" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M5.523 13.523a8 8 0 0111.954-2.553M20 20v-5h-5M18.477 10.477a8 8 0 01-11.954 2.553" /></svg>
                     Tạo Ảnh Nền Ngẫu Nhiên
                 </button>
@@ -174,8 +175,8 @@
                 <h3 class="text-lg font-semibold text-amber-900">Chọn Mẫu Bố Cục</h3>
                 <div class="grid grid-cols-3 gap-3 layout-selector"></div>
                 <div class="mt-4 pt-4 border-t">
-                    <label for="logo-size" class="block text-sm font-medium text-amber-800">Kích thước Logo: <span id="logo-size-value">15</span>%</label>
-                    <input type="range" id="logo-size" min="5" max="40" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <label for="logo-size" class="block text-sm font-medium text-amber-800">Kích thước Logo: <span data-value-for="logo-size">15</span>%</label>
+                    <input type="range" data-input="logo-size" min="5" max="40" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                 </div>
             </div>
         </div>
@@ -184,11 +185,11 @@
             <div class="space-y-4">
                 <div>
                     <label for="text1" class="block text-sm font-medium text-amber-800">Nội dung chính</label>
-                    <textarea id="text1" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"></textarea>
+                    <textarea data-input="main-text" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"></textarea>
                 </div>
                 <div>
                     <label for="text3" class="block text-sm font-medium text-amber-800">Ghi chú (Nguồn, ngày tháng...)</label>
-                    <input type="text" id="text3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500">
+                    <input type="text" data-input="note-text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500">
                 </div>
             </div>
         </div>
@@ -207,8 +208,8 @@
                             <div class="grid grid-cols-5 gap-2 choice-selector main-color-selector"></div>
                         </div>
                         <div>
-                             <label for="main-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span class="main-font-size-value">50</span></label>
-                             <input type="range" id="main-font-size" min="10" max="120" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                             <label class="font-semibold text-sm text-amber-800">Kích thước chữ: <span data-value-for="main-font-size">50</span></label>
+                             <input type="range" data-input="main-font-size" min="10" max="120" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
                 </details>
@@ -224,8 +225,8 @@
                             <div class="grid grid-cols-5 gap-2 choice-selector note-color-selector"></div>
                         </div>
                         <div>
-                             <label for="note-font-size" class="font-semibold text-sm text-amber-800">Kích thước chữ: <span class="note-font-size-value">20</span></label>
-                             <input type="range" id="note-font-size" min="10" max="60" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                             <label class="font-semibold text-sm text-amber-800">Kích thước chữ: <span data-value-for="note-font-size">20</span></label>
+                             <input type="range" data-input="note-font-size" min="10" max="60" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                         </div>
                      </div>
                 </details>
@@ -320,37 +321,16 @@
         }
 
         function generateUIComponents() {
-             const uniqueId = (base) => `${base}-${Math.random().toString(36).substr(2, 9)}`;
-
-            document.querySelectorAll('.layout-selector').forEach(container => {
-                const parentId = container.closest('.mobile-panel, #desktop-controls-content').id;
-                container.innerHTML = '';
-                for (const key in layouts) {
-                    const layout = layouts[key];
-                    const radioId = uniqueId(key);
-                    container.innerHTML += `
-                        <div>
-                            <input type="radio" name="layout-${parentId}" id="${radioId}" value="${key}" class="hidden">
-                            <label for="${radioId}" class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
-                                <div class="layout-preview-box">${generateLayoutPreview(layout)}</div>
-                                <span class="text-sm font-semibold mt-2 block">${layout.name}</span>
-                            </label>
-                        </div>`;
-                }
-            });
-
-            const createSelector = (selectorClass, items, name) => {
-                document.querySelectorAll(`.${selectorClass}`).forEach(container => {
-                    const parentId = container.closest('.mobile-panel, #desktop-controls-content').id;
+            const createSelector = (containerClass, items, name, type) => {
+                document.querySelectorAll(`.${containerClass}`).forEach(container => {
                     container.innerHTML = '';
                     let content = '';
                     items.forEach((item) => {
-                        const radioId = uniqueId(name);
                         content += `
-                            <div>
-                                <input type="radio" name="${name}-${parentId}" id="${radioId}" value="${item}" class="hidden">
-                                <label for="${radioId}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${selectorClass.includes('color') ? `background-color:${item}` : `font-family:'${item}'`}">
-                                    ${selectorClass.includes('color') ? '&nbsp;' : item}
+                            <div class="choice-item">
+                                <input type="radio" name="${name}" data-input="${name}" value="${item}" class="hidden">
+                                <label class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${type === 'color' ? `background-color:${item}` : `font-family:'${item}'`}">
+                                    ${type === 'color' ? '&nbsp;' : item}
                                 </label>
                             </div>`;
                     });
@@ -358,10 +338,25 @@
                 });
             };
             
-            createSelector('main-font-selector', fontProfiles, 'main-font');
-            createSelector('note-font-selector', fontProfiles, 'note-font');
-            createSelector('main-color-selector', colorProfiles, 'main-color');
-            createSelector('note-color-selector', colorProfiles, 'note-color');
+            createSelector('main-font-selector', fontProfiles, 'main-font', 'font');
+            createSelector('note-font-selector', fontProfiles, 'note-font', 'font');
+            createSelector('main-color-selector', colorProfiles, 'main-color', 'color');
+            createSelector('note-color-selector', colorProfiles, 'note-color', 'color');
+            
+            document.querySelectorAll('.layout-selector').forEach(container => {
+                container.innerHTML = '';
+                for (const key in layouts) {
+                    const layout = layouts[key];
+                    container.innerHTML += `
+                        <div>
+                            <input type="radio" name="layout" data-input="layout" value="${key}" class="hidden">
+                            <label class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
+                                <div class="layout-preview-box">${generateLayoutPreview(layout)}</div>
+                                <span class="text-sm font-semibold mt-2 block">${layout.name}</span>
+                            </label>
+                        </div>`;
+                }
+            });
         }
 
         function generateLayoutPreview(layout) {
@@ -374,31 +369,41 @@
         }
         
         function updateAllInputs() {
-            document.querySelectorAll('textarea[id^="text1"]').forEach(el => el.value = state.mainText);
-            document.querySelectorAll('input[id^="text3"]').forEach(el => el.value = state.noteText);
+            document.querySelectorAll('[data-input="main-text"]').forEach(el => el.value = state.mainText);
+            document.querySelectorAll('[data-input="note-text"]').forEach(el => el.value = state.noteText);
             
-            document.querySelectorAll(`input[type="radio"]`).forEach(el => {
-                if (el.name.includes('layout')) el.checked = el.value === state.layout;
-                if (el.name.includes('main-font')) el.checked = el.value === state.main.font;
-                if (el.name.includes('note-font')) el.checked = el.value === state.note.font;
-                if (el.name.includes('main-color')) el.checked = el.value === state.main.color;
-                if (el.name.includes('note-color')) el.checked = el.value === state.note.color;
-            });
+            document.querySelectorAll('input[name="layout"]').forEach(el => el.checked = el.value === state.layout);
+            document.querySelectorAll('input[name="main-font"]').forEach(el => el.checked = el.value === state.main.font);
+            document.querySelectorAll('input[name="note-font"]').forEach(el => el.checked = el.value === state.note.font);
+            document.querySelectorAll('input[name="main-color"]').forEach(el => el.checked = el.value === state.main.color);
+            document.querySelectorAll('input[name="note-color"]').forEach(el => el.checked = el.value === state.note.color);
             
-            document.querySelectorAll('input[id^="logo-size"]').forEach(el => el.value = state.logo.size);
-            document.querySelectorAll('span[id^="logo-size-value"]').forEach(el => el.textContent = state.logo.size);
-            document.querySelectorAll('input[id^="main-font-size"]').forEach(el => el.value = state.main.fontSize);
-            document.querySelectorAll('span.main-font-size-value').forEach(el => el.textContent = state.main.fontSize);
-            document.querySelectorAll('input[id^="note-font-size"]').forEach(el => el.value = state.note.fontSize);
-            document.querySelectorAll('span.note-font-size-value').forEach(el => el.textContent = state.note.fontSize);
+            document.querySelectorAll('[data-input="logo-size"]').forEach(el => el.value = state.logo.size);
+            document.querySelectorAll('[data-value-for="logo-size"]').forEach(el => el.textContent = state.logo.size);
+            document.querySelectorAll('[data-input="main-font-size"]').forEach(el => el.value = state.main.fontSize);
+            document.querySelectorAll('[data-value-for="main-font-size"]').forEach(el => el.textContent = state.main.fontSize);
+            document.querySelectorAll('[data-input="note-font-size"]').forEach(el => el.value = state.note.fontSize);
+            document.querySelectorAll('[data-value-for="note-font-size"]').forEach(el => el.textContent = state.note.fontSize);
         }
 
         // --- EVENT HANDLING ---
         function setupEventListeners() {
-            document.body.addEventListener('input', handleInput);
-            document.body.addEventListener('change', handleInput);
-            document.body.addEventListener('click', (e) => {
-                if (e.target.closest('button[id^="generate-random-image-btn"]')) {
+            document.body.addEventListener('input', (e) => {
+                if(e.target.dataset.input) {
+                    handleInput(e.target.dataset.input, e.target.value);
+                }
+            });
+             document.body.addEventListener('click', (e) => {
+                const label = e.target.closest('label');
+                if (label) {
+                    const input = label.previousElementSibling;
+                    if (input && input.dataset.input) {
+                        input.checked = true;
+                        handleInput(input.dataset.input, input.value);
+                    }
+                }
+
+                if (e.target.closest('[data-action="generate-image"]')) {
                     handleImageGeneration();
                 }
                 if (e.target.closest('#mobile-download-btn')) {
@@ -433,22 +438,19 @@
             });
         }
         
-        function handleInput(e) {
-            const target = e.target;
-            const name = target.name;
-            const value = target.value;
-            
-            if (target.id.includes('text1')) state.mainText = value;
-            if (target.id.includes('text3')) state.noteText = value;
-            if (target.id.includes('logo-size')) state.logo.size = value;
-            if (target.id.includes('main-font-size')) state.main.fontSize = value;
-            if (target.id.includes('note-font-size')) state.note.fontSize = value;
-            if (name && name.includes('layout')) state.layout = value;
-            if (name && name.includes('main-font')) state.main.font = value;
-            if (name && name.includes('note-font')) state.note.font = value;
-            if (name && name.includes('main-color')) state.main.color = value;
-            if (name && name.includes('note-color')) state.note.color = value;
-
+        function handleInput(type, value) {
+            switch(type) {
+                case 'main-text': state.mainText = value; break;
+                case 'note-text': state.noteText = value; break;
+                case 'layout': state.layout = value; break;
+                case 'logo-size': state.logo.size = value; break;
+                case 'main-font': state.main.font = value; break;
+                case 'main-color': state.main.color = value; break;
+                case 'main-font-size': state.main.fontSize = value; break;
+                case 'note-font': state.note.font = value; break;
+                case 'note-color': state.note.color = value; break;
+                case 'note-font-size': state.note.fontSize = value; break;
+            }
             updateAllInputs();
             redrawCanvas();
         }
