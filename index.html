@@ -284,20 +284,20 @@
     <script type="module">
         // --- STATE & CONFIGURATION ---
         const state = {
-            mainText: "Lời hay ý đẹp từ kinh sách, mang lại sự an lạc và trí tuệ.",
-            noteText: "Nguồn: Lời Phật Dạy",
+            mainText: "",
+            noteText: "",
             layout: 'layout1',
             main: { 
                 font: 'Playfair Display', 
                 color: '#FFFFFF', 
                 fontSize: 50,
-                background: { visible: true, color: '#000000', opacity: 0.4 }
+                background: { visible: false, color: '#000000', opacity: 0.4 }
             },
             note: { 
                 font: 'Roboto', 
                 color: '#FFFFFF', 
                 fontSize: 20,
-                background: { visible: true, color: '#000000', opacity: 0.4 }
+                background: { visible: false, color: '#000000', opacity: 0.4 }
             },
             logo: { size: 15, visible: false }
         };
@@ -533,24 +533,35 @@
         }
         
         function handleInput(type, value) {
-            const keys = type.split('-');
-            switch(keys[0]) {
-                case 'main':
-                case 'note':
-                    const target = state[keys[0]];
-                    if (keys[1] === 'bg') { // background properties
-                        target.background[keys[2]] = value;
-                    } else { // font properties
-                        const prop = keys.slice(1).join('');
-                        const finalProp = prop.charAt(0).toLowerCase() + prop.slice(1);
-                        target[finalProp] = value;
-                    }
-                    break;
-                case 'logo':
-                    state.logo[keys[1]] = value;
-                    break;
-                default:
-                    state[type] = value;
+            switch(type) {
+                // Simple state
+                case 'main-text': state.mainText = value; break;
+                case 'note-text': state.noteText = value; break;
+                case 'layout': state.layout = value; break;
+
+                // Logo
+                case 'logo-visible': state.logo.visible = value; break;
+                case 'logo-size': state.logo.size = value; break;
+
+                // Main text style
+                case 'main-font': state.main.font = value; break;
+                case 'main-color': state.main.color = value; break;
+                case 'main-font-size': state.main.fontSize = value; break;
+
+                // Main text background
+                case 'main-bg-visible': state.main.background.visible = value; break;
+                case 'main-bg-color': state.main.background.color = value; break;
+                case 'main-bg-opacity': state.main.background.opacity = value; break;
+
+                // Note text style
+                case 'note-font': state.note.font = value; break;
+                case 'note-color': state.note.color = value; break;
+                case 'note-font-size': state.note.fontSize = value; break;
+
+                // Note text background
+                case 'note-bg-visible': state.note.background.visible = value; break;
+                case 'note-bg-color': state.note.background.color = value; break;
+                case 'note-bg-opacity': state.note.background.opacity = value; break;
             }
             updateAllInputs();
             redrawCanvas();
@@ -619,7 +630,7 @@
         function drawLogo(position) {
             const logoSize = canvas.width * (state.logo.size / 100);
             const margin = canvas.width * 0.04;
-            let { x, y } = getXY(position, margin, logoSize, logoSize);
+            let { x, y } = getXY(position, margin, logoSize, logoSize, state.logo);
             
             if (position.h === 'right') x = canvas.width - margin - logoSize;
 
@@ -636,7 +647,7 @@
             const lines = wrapText(ctx, text, maxWidth);
             const lineHeight = fontSize * 1.3;
             const textBlockHeight = lines.length * lineHeight;
-            const { x, y, textAlign } = getXY(position, margin, maxWidth, textBlockHeight);
+            const { x, y, textAlign } = getXY(position, margin, maxWidth, textBlockHeight, style);
             ctx.textAlign = textAlign;
 
             // Draw background if enabled
@@ -674,7 +685,7 @@
             });
         }
 
-        function getXY(position, margin, blockWidth, blockHeight) {
+        function getXY(position, margin, blockWidth, blockHeight, style) {
             let x, y, textAlign;
             switch(position.h) {
                 case 'left': x = margin; textAlign = 'left'; break;
@@ -687,13 +698,13 @@
                 default: y = (canvas.height / 2) - (blockHeight / 2);
             }
             if (position.v !== 'bottom') {
-                 y += fontSizeFromStyle(position.v === 'top' ? state.main : state.note);
+                 y += fontSizeFromStyle(style);
             }
             return { x, y, textAlign };
         }
         
         function fontSizeFromStyle(style) {
-             return (canvas.width / 1024) * style.fontSize;
+             return (canvas.width / 1024) * (style.fontSize || 0);
         }
 
         function wrapText(ctx, text, maxWidth) {
