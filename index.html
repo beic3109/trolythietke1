@@ -15,6 +15,9 @@
             --mau-nau-dam: #8C5A2B;
             --mau-vang-cam: #D97706;
         }
+        html, body {
+            overscroll-behavior: none; /* Prevent pull-to-refresh */
+        }
         body { 
             font-family: 'Be Vietnam Pro', sans-serif; 
             background-color: var(--mau-nen);
@@ -25,7 +28,7 @@
         .control-panel-section {
             background-color: white;
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             border: 1px solid rgba(0,0,0,0.05);
         }
@@ -54,25 +57,7 @@
         .layout-preview-box .note-placeholder { background-color: #F87171; width: 40%; }
         .layout-preview-box .text-placeholder { background-color: #60A5FA; width: 80%; padding: 8px 0; }
 
-        #mobile-toolbar { transition: transform 0.3s ease-in-out; }
-        .mobile-panel {
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
-            visibility: hidden;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .mobile-panel.is-open { transform: translateY(0); visibility: visible; }
-        .mobile-panel-content {
-            overflow-y: auto;
-            padding: 0.25rem;
-            flex-grow: 1; /* Fix for scrolling */
-        }
         #mobile-toolbar button.active { color: var(--mau-vang-cam); background-color: #FFFBEB; }
-
-        details > summary { list-style: none; cursor: pointer; }
-        details > summary::-webkit-details-marker { display: none; }
         
         .loader { 
             border: 5px solid #D1C4A8; border-top: 5px solid #8C5A2B;
@@ -83,11 +68,11 @@
 
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body class="overflow-hidden h-screen">
 
-    <div class="flex flex-col lg:flex-row min-h-screen">
-        <!-- Image Display Area -->
-        <div id="image-panel" class="w-full lg:w-2/3 bg-gray-200 flex items-center justify-center p-4 lg:p-8 relative">
+    <!-- Desktop UI -->
+    <div class="hidden lg:flex flex-col lg:flex-row min-h-screen">
+        <div class="w-full lg:w-2/3 bg-gray-200 flex items-center justify-center p-4 lg:p-8 relative">
             <div id="canvas-container" class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
                 <canvas id="resultCanvas" class="w-full h-auto rounded-lg"></canvas>
             </div>
@@ -96,9 +81,7 @@
                 <p class="text-white font-semibold mt-4">Đang tạo ảnh nền, vui lòng chờ...</p>
             </div>
         </div>
-
-        <!-- Desktop Controls -->
-        <div id="controls-panel" class="hidden lg:block w-full lg:w-1/3 bg-white border-l-4 border-yellow-100 p-8 space-y-6 overflow-y-auto">
+        <div id="desktop-controls-panel" class="w-full lg:w-1/3 bg-white border-l-4 border-yellow-100 p-8 space-y-6 overflow-y-auto">
             <header class="text-center mb-6">
                 <h1 class="text-3xl md:text-4xl font-bold text-amber-800 font-display">Trợ Lý Thiết Kế V5</h1>
                 <p class="text-amber-600 mt-1">Giao diện hoàn thiện, trải nghiệm tối ưu.</p>
@@ -112,41 +95,34 @@
     </div>
 
     <!-- Mobile UI -->
-    <div class="lg:hidden">
-        <div id="panels-container" class="fixed inset-0 bg-black bg-opacity-30 z-40" style="visibility: hidden;"></div>
-        
-        <div id="image-gen-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
-            <h3 class="font-bold text-lg mb-4 text-center flex-shrink-0">Bước 1: Tạo Ảnh Nền</h3>
-            <section id="image-gen-controls" class="mobile-panel-content"></section>
-        </div>
-        <div id="layout-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
-            <h3 class="font-bold text-lg mb-4 text-center flex-shrink-0">Bước 2: Chọn Bố Cục</h3>
-            <section id="layout-controls" class="mobile-panel-content"></section>
-        </div>
-        <div id="text-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
-             <h3 class="font-bold text-lg mb-4 text-center flex-shrink-0">Bước 3: Nhập Nội Dung</h3>
-            <section id="text-controls" class="mobile-panel-content"></section>
-        </div>
-        <div id="style-panel" class="mobile-panel fixed bottom-0 left-0 right-0 bg-white p-5 rounded-t-2xl shadow-2xl z-50">
-             <h3 class="font-bold text-lg mb-4 text-center flex-shrink-0">Bước 4: Tùy Chỉnh Font</h3>
-            <section id="style-controls" class="mobile-panel-content"></section>
+    <div id="mobile-app" class="lg:hidden flex flex-col h-screen overflow-hidden">
+        <div id="mobile-image-panel" class="w-full aspect-square flex items-center justify-center p-2 bg-gray-200 flex-shrink-0">
+            <div id="mobile-canvas-container" class="w-full h-full bg-white rounded-xl shadow-lg">
+                <!-- Canvas will be moved here by JS -->
+            </div>
         </div>
 
-        <!-- Mobile Toolbar -->
-        <div id="mobile-toolbar" class="fixed bottom-0 left-0 right-0 bg-white h-20 border-t shadow-lg flex justify-around items-center z-50">
-            <button data-panel="image-gen-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
+        <div id="mobile-controls-host" class="flex-grow overflow-hidden relative bg-amber-50 border-t-2 border-amber-200">
+            <div id="mobile-image-gen-panel" class="mobile-panel-instance h-full overflow-y-auto p-4"></div>
+            <div id="mobile-layout-panel" class="mobile-panel-instance h-full overflow-y-auto p-4 hidden"></div>
+            <div id="mobile-text-panel" class="mobile-panel-instance h-full overflow-y-auto p-4 hidden"></div>
+            <div id="mobile-style-panel" class="mobile-panel-instance h-full overflow-y-auto p-4 hidden"></div>
+        </div>
+
+        <div id="mobile-toolbar" class="flex-shrink-0 bg-white h-20 border-t shadow-lg flex justify-around items-center z-50">
+             <button data-panel="mobile-image-gen-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 <span class="text-xs mt-1">Ảnh Nền</span>
             </button>
-            <button data-panel="layout-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
+            <button data-panel="mobile-layout-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" /></svg>
                 <span class="text-xs mt-1">Bố Cục</span>
             </button>
-            <button data-panel="text-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
+            <button data-panel="mobile-text-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                 <span class="text-xs mt-1">Nội Dung</span>
             </button>
-            <button data-panel="style-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
+            <button data-panel="mobile-style-panel" class="mobile-tool-btn flex flex-col items-center justify-center text-gray-600 p-2 rounded-lg w-1/5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
                 <span class="text-xs mt-1">Kiểu Chữ</span>
             </button>
@@ -175,7 +151,7 @@
                 <h3 class="text-lg font-semibold text-amber-900">Chọn Mẫu Bố Cục</h3>
                 <div class="grid grid-cols-3 gap-3 layout-selector"></div>
                 <div class="mt-4 pt-4 border-t">
-                    <label for="logo-size" class="block text-sm font-medium text-amber-800">Kích thước Logo: <span data-value-for="logo-size">15</span>%</label>
+                    <label class="block text-sm font-medium text-amber-800">Kích thước Logo: <span data-value-for="logo-size">15</span>%</label>
                     <input type="range" data-input="logo-size" min="5" max="40" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                 </div>
             </div>
@@ -184,11 +160,11 @@
             <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 3: Nhập Nội Dung</h2>
             <div class="space-y-4">
                 <div>
-                    <label for="text1" class="block text-sm font-medium text-amber-800">Nội dung chính</label>
+                    <label class="block text-sm font-medium text-amber-800">Nội dung chính</label>
                     <textarea data-input="main-text" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"></textarea>
                 </div>
                 <div>
-                    <label for="text3" class="block text-sm font-medium text-amber-800">Ghi chú (Nguồn, ngày tháng...)</label>
+                    <label class="block text-sm font-medium text-amber-800">Ghi chú (Nguồn, ngày tháng...)</label>
                     <input type="text" data-input="note-text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500">
                 </div>
             </div>
@@ -267,6 +243,7 @@
 
         // --- INITIALIZATION ---
         function init() {
+            setupLayout();
             cloneControls();
             generateUIComponents();
             setupEventListeners();
@@ -276,19 +253,29 @@
             });
         }
         
+        function setupLayout() {
+            if (window.innerWidth < 1024) { // Corresponds to lg: breakpoint
+                const mobileCanvasContainer = document.getElementById('mobile-canvas-container');
+                mobileCanvasContainer.appendChild(canvas);
+            }
+        }
+
         function cloneControls() {
             const desktopContainer = document.getElementById('desktop-controls-content');
+            const mobileHost = document.getElementById('mobile-controls-host');
             const templates = {
-                'image-gen-controls': document.getElementById('template-image-gen-controls'),
-                'layout-controls': document.getElementById('template-layout-controls'),
-                'text-controls': document.getElementById('template-text-controls'),
-                'style-controls': document.getElementById('template-style-controls'),
+                'image-gen': document.getElementById('template-image-gen-controls'),
+                'layout': document.getElementById('template-layout-controls'),
+                'text': document.getElementById('template-text-controls'),
+                'style': document.getElementById('template-style-controls'),
             };
 
             for (const key in templates) {
                 const templateNode = templates[key];
-                document.getElementById(key).appendChild(templateNode.cloneNode(true));
+                // Desktop
                 desktopContainer.appendChild(templateNode.cloneNode(true));
+                // Mobile
+                document.getElementById(`mobile-${key}-panel`).appendChild(templateNode.cloneNode(true));
             }
         }
 
@@ -328,7 +315,7 @@
                     items.forEach((item) => {
                         content += `
                             <div class="choice-item">
-                                <input type="radio" name="${name}" data-input="${name}" value="${item}" class="hidden">
+                                <input type="radio" name="${name}-${container.closest('[id]').id}" data-input="${name}" value="${item}" class="hidden">
                                 <label class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${type === 'color' ? `background-color:${item}` : `font-family:'${item}'`}">
                                     ${type === 'color' ? '&nbsp;' : item}
                                 </label>
@@ -349,7 +336,7 @@
                     const layout = layouts[key];
                     container.innerHTML += `
                         <div>
-                            <input type="radio" name="layout" data-input="layout" value="${key}" class="hidden">
+                            <input type="radio" name="layout-${container.closest('[id]').id}" data-input="layout" value="${key}" class="hidden">
                             <label class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
                                 <div class="layout-preview-box">${generateLayoutPreview(layout)}</div>
                                 <span class="text-sm font-semibold mt-2 block">${layout.name}</span>
@@ -372,11 +359,11 @@
             document.querySelectorAll('[data-input="main-text"]').forEach(el => el.value = state.mainText);
             document.querySelectorAll('[data-input="note-text"]').forEach(el => el.value = state.noteText);
             
-            document.querySelectorAll('input[name="layout"]').forEach(el => el.checked = el.value === state.layout);
-            document.querySelectorAll('input[name="main-font"]').forEach(el => el.checked = el.value === state.main.font);
-            document.querySelectorAll('input[name="note-font"]').forEach(el => el.checked = el.value === state.note.font);
-            document.querySelectorAll('input[name="main-color"]').forEach(el => el.checked = el.value === state.main.color);
-            document.querySelectorAll('input[name="note-color"]').forEach(el => el.checked = el.value === state.note.color);
+            document.querySelectorAll('input[data-input="layout"]').forEach(el => el.checked = el.value === state.layout);
+            document.querySelectorAll('input[data-input="main-font"]').forEach(el => el.checked = el.value === state.main.font);
+            document.querySelectorAll('input[data-input="note-font"]').forEach(el => el.checked = el.value === state.note.font);
+            document.querySelectorAll('input[data-input="main-color"]').forEach(el => el.checked = el.value === state.main.color);
+            document.querySelectorAll('input[data-input="note-color"]').forEach(el => el.checked = el.value === state.note.color);
             
             document.querySelectorAll('[data-input="logo-size"]').forEach(el => el.value = state.logo.size);
             document.querySelectorAll('[data-value-for="logo-size"]').forEach(el => el.textContent = state.logo.size);
@@ -396,7 +383,7 @@
              document.body.addEventListener('click', (e) => {
                 const label = e.target.closest('label');
                 if (label) {
-                    const input = label.previousElementSibling;
+                    const input = label.parentElement.querySelector('input');
                     if (input && input.dataset.input) {
                         input.checked = true;
                         handleInput(input.dataset.input, input.value);
@@ -412,25 +399,17 @@
             });
 
             const mobileToolBtns = document.querySelectorAll('.mobile-tool-btn');
-            const panelsContainer = document.getElementById('panels-container');
             mobileToolBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const panelId = btn.dataset.panel;
                     if (!panelId) return;
-                    const panel = document.getElementById(panelId);
-                    const isOpen = panel.classList.contains('is-open');
-                    closeAllPanels();
-                    if (!isOpen) {
-                        panel.classList.add('is-open');
-                        panelsContainer.style.visibility = 'visible';
-                        btn.classList.add('active');
-                    }
+
+                    document.querySelectorAll('.mobile-panel-instance').forEach(p => p.classList.add('hidden'));
+                    document.getElementById(panelId).classList.remove('hidden');
+                    
+                    mobileToolBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
                 });
-            });
-            panelsContainer.addEventListener('click', (e) => {
-                if (e.target === panelsContainer) {
-                    closeAllPanels();
-                }
             });
             
             downloadBtn.addEventListener('click', () => {
@@ -453,12 +432,6 @@
             }
             updateAllInputs();
             redrawCanvas();
-        }
-
-        function closeAllPanels() {
-            document.querySelectorAll('.mobile-panel.is-open').forEach(p => p.classList.remove('is-open'));
-            document.querySelectorAll('.mobile-tool-btn.active').forEach(b => b.classList.remove('active'));
-            document.getElementById('panels-container').style.visibility = 'hidden';
         }
         
         // --- IMAGE GENERATION ---
