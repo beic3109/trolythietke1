@@ -655,41 +655,52 @@
         }
 
 	function handleInput(type, value) {
-            // Tách loại và thuộc tính một cách an toàn hơn
-            const parts = type.split('-');
-            const category = parts[0]; // 'main', 'note', 'layout', etc.
-            const property = parts.slice(1).join('-'); // 'font', 'stroke-width', etc.
+            const s = state; // Viết tắt cho state
 
-            // Xử lý các trường hợp đặc biệt trước
-            if (type === 'main-text') {
-                state.mainText = value;
-            } else if (type === 'note-text') {
-                state.noteText = value;
-            } else if (type === 'layout') {
-                state.layout = value;
-            } else if (type === 'logo-visible') {
-                state.logo.visible = value;
-            } else if (type === 'logo-size') {
-                state.logo.size = value;
-            } 
-            // Xử lý các thuộc tính có cấu trúc (main/note)
-            else if (state[category] && state[category][property] !== undefined) {
-                 state[category][property] = value;
-            } 
-            // Xử lý các thuộc tính con có cấu trúc (background, stroke, shadow)
-            else {
-                const subParts = property.split('-');
-                if (state[category] && state[category][subParts[0]]) {
-                    const subCategory = subParts[0]; // 'bg', 'stroke', 'shadow'
-                    const subProperty = subParts.slice(1).join(''); // 'visible', 'color', 'opacity' etc.
-                    // Ánh xạ tên ngắn gọn tới tên đầy đủ trong state
-                    const map = { bg: 'background', stroke: 'stroke', shadow: 'shadow' };
-                    if (map[subCategory]) {
-                         state[category][map[subCategory]][subProperty] = value;
-                    }
-                }
+            // Sử dụng switch-case để xử lý từng trường hợp một cách tường minh
+            switch(type) {
+                // Các thuộc tính chính
+                case 'main-text':           s.mainText = value; break;
+                case 'note-text':           s.noteText = value; break;
+                case 'layout':              s.layout = value; break;
+                
+                // Thuộc tính Logo
+                case 'logo-visible':        s.logo.visible = value; break;
+                case 'logo-size':           s.logo.size = value; break;
+
+                // Thuộc tính Văn Bản Chính
+                case 'main-font':                   s.main.font = value; break;
+                case 'main-color':                  s.main.color = value; break;
+                case 'main-font-size':              s.main.fontSize = value; break; // Sửa lỗi ở đây
+                case 'main-bg-visible':             s.main.background.visible = value; break;
+                case 'main-bg-color':               s.main.background.color = value; break;
+                case 'main-bg-opacity':             s.main.background.opacity = value; break;
+                case 'main-stroke-visible':         s.main.stroke.visible = value; break;
+                case 'main-stroke-color':           s.main.stroke.color = value; break;
+                case 'main-stroke-width':           s.main.stroke.width = value; break;
+                case 'main-shadow-visible':         s.main.shadow.visible = value; break;
+                case 'main-shadow-color':           s.main.shadow.color = value; break;
+                case 'main-shadow-blur':            s.main.shadow.blur = value; break;
+                case 'main-shadow-offsetX':         s.main.shadow.offsetX = value; break;
+                case 'main-shadow-offsetY':         s.main.shadow.offsetY = value; break;
+
+                // Thuộc tính Ghi Chú
+                case 'note-font':                   s.note.font = value; break;
+                case 'note-color':                  s.note.color = value; break;
+                case 'note-font-size':              s.note.fontSize = value; break; // Sửa lỗi ở đây
+                case 'note-bg-visible':             s.note.background.visible = value; break;
+                case 'note-bg-color':               s.note.background.color = value; break;
+                case 'note-bg-opacity':             s.note.background.opacity = value; break;
+                case 'note-stroke-visible':         s.note.stroke.visible = value; break;
+                case 'note-stroke-color':           s.note.stroke.color = value; break;
+                case 'note-stroke-width':           s.note.stroke.width = value; break;
+                case 'note-shadow-visible':         s.note.shadow.visible = value; break;
+                case 'note-shadow-color':           s.note.shadow.color = value; break;
+                case 'note-shadow-blur':            s.note.shadow.blur = value; break;
+                case 'note-shadow-offsetX':         s.note.shadow.offsetX = value; break;
+                case 'note-shadow-offsetY':         s.note.shadow.offsetY = value; break;
             }
-            
+
             updateAllInputs();
             redrawCanvas();
         }
