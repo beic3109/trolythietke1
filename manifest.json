@@ -1,7 +1,7 @@
 {
-  "name": "Trợ Lý Thiết Kế 1",
-  "short_name": "Trợ Lý Thiết Kế 1",
-  "description": "Trợ Lý Thiết Kế 1 - Pháp Môn Tâm Linh.",
+  "name": "Trợ Lý Thiết Kế",
+  "short_name": "Trợ Lý Thiết Kế",
+  "description": "Trợ Lý Thiết Kế - Pháp Môn Tâm Linh.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f0f2f5",
@@ -40,3 +40,4 @@
   ]
 
 }
+
