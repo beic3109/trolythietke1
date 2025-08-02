@@ -1,7 +1,7 @@
 {
-  "name": "Radio PMTL",
-  "short_name": "Radio PMTL",
-  "description": "Kênh Phát Thanh Phật Giáo - Pháp Môn Tâm Linh.",
+  "name": "Trợ Lý Thiết Kế 1",
+  "short_name": "Trợ Lý Thiết Kế 1",
+  "description": "Trợ Lý Thiết Kế 1 - Pháp Môn Tâm Linh.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f0f2f5",
@@ -38,4 +38,5 @@
       "type": "image/png"
     }
   ]
+
 }
