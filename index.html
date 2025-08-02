@@ -83,7 +83,6 @@
 </head>
 <body>
 
-    <!-- Desktop UI -->
     <div class="hidden lg:flex h-screen">
         <div class="w-2/3 bg-gray-200 flex items-center justify-center p-8 relative">
             <div id="canvas-container" class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
@@ -109,12 +108,10 @@
         </div>
     </div>
 
-    <!-- Mobile UI -->
     <div id="mobile-app" class="lg:hidden flex flex-col fixed inset-0">
         <div id="mobile-image-panel" class="w-full aspect-square flex items-center justify-center p-2 bg-gray-200 flex-shrink-0">
             <div id="mobile-canvas-container" class="w-full h-full bg-white rounded-xl shadow-lg">
-                <!-- Canvas will be moved here by JS -->
-            </div>
+                </div>
         </div>
 
         <div id="mobile-controls-host" class="flex-grow overflow-hidden relative bg-amber-50 border-t-2 border-amber-200">
@@ -148,12 +145,10 @@
         </div>
     </div>
     
-    <!-- Templates for cloning -->
     <div id="templates" class="hidden">
         <div id="template-image-gen-controls" class="control-panel-section bg-green-50">
             <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 1: Chọn Ảnh Nền</h2>
             <div class="space-y-4">
-                <!-- Nút tải ảnh lên -->
                 <input type="file" class="image-upload-input hidden" accept="image/*">
                 <button data-action="upload-image" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -162,7 +157,6 @@
                     Tải Ảnh Của Bạn Lên (1:1)
                 </button>
                 <p class="text-sm text-amber-700 text-center">- hoặc -</p>
-                <!-- Nút tạo ảnh ngẫu nhiên -->
                 <button data-action="generate-image" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-md flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M5.523 13.523a8 8 0 0111.954-2.553M20 20v-5h-5M18.477 10.477a8 8 0 01-11.954 2.553" /></svg>
                     Tạo Ảnh Nền Ngẫu Nhiên
@@ -206,77 +200,195 @@
             <h2 class="text-xl font-bold text-amber-900 mb-3">Bước 4: Tùy Chỉnh Font</h2>
             <div class="space-y-4">
                  <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
-                    <summary class="flex justify-between items-center font-semibold text-amber-900">Văn Bản Chính</summary>
+                    <summary class="flex justify-between items-center font-semibold text-amber-900 cursor-pointer">Văn Bản Chính</summary>
                     <div class="mt-4 space-y-5">
-                        <div>
-                            <label class="font-semibold text-sm text-amber-800">Font chữ</label>
-                            <div class="grid grid-cols-2 gap-2 choice-selector main-font-selector"></div>
-                        </div>
-                        <div>
-                            <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
-                            <div class="grid grid-cols-5 gap-2 choice-selector main-color-selector"></div>
-                        </div>
-                        <div>
-                             <label class="font-semibold text-sm text-amber-800">Kích thước chữ: <span data-value-for="main-font-size">50</span></label>
-                             <input type="range" data-input="main-font-size" min="10" max="120" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <!-- Main Text Background Controls -->
-                        <div class="pt-4 border-t border-amber-200">
-                            <div class="flex items-center justify-between">
-                                <label class="font-semibold text-sm text-amber-800">Nền Văn Bản</label>
-                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                    <input type="checkbox" data-input="main-bg-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                    <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                                </div>
-                            </div>
-                            <div data-container="main-bg-controls" class="space-y-5 mt-3 hidden">
+                        <details class="bg-white rounded-lg border border-amber-200 p-3 transition" open>
+                             <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Kiểu Chữ & Màu Sắc</summary>
+                             <div class="mt-3 space-y-4">
                                 <div>
-                                    <label class="font-semibold text-sm text-amber-800">Màu Nền</label>
-                                    <div class="grid grid-cols-5 gap-2 choice-selector main-bg-color-selector"></div>
+                                    <label class="font-semibold text-xs text-amber-800">Font chữ</label>
+                                    <div class="grid grid-cols-2 gap-2 choice-selector main-font-selector"></div>
                                 </div>
                                 <div>
-                                    <label class="font-semibold text-sm text-amber-800">Độ trong suốt: <span data-value-for="main-bg-opacity">0.4</span></label>
-                                    <input type="range" data-input="main-bg-opacity" min="0" max="1" step="0.1" value="0.4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    <label class="font-semibold text-xs text-amber-800">Màu Sắc</label>
+                                    <div class="grid grid-cols-5 gap-2 choice-selector main-color-selector"></div>
+                                </div>
+                                <div>
+                                     <label class="font-semibold text-xs text-amber-800">Kích thước chữ: <span data-value-for="main-font-size">50</span></label>
+                                     <input type="range" data-input="main-font-size" min="10" max="120" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                </div>
+                             </div>
+                        </details>
+                        <details class="bg-white rounded-lg border border-amber-200 p-3 transition">
+                            <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Nền Văn Bản</summary>
+                            <div class="mt-3 space-y-4">
+                               <div class="flex items-center justify-between">
+                                    <label class="font-semibold text-xs text-amber-800">Bật/Tắt Nền</label>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" data-input="main-bg-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div data-container="main-bg-controls" class="space-y-4 hidden">
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Màu Nền</label>
+                                        <div class="grid grid-cols-5 gap-2 choice-selector main-bg-color-selector"></div>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Độ trong suốt: <span data-value-for="main-bg-opacity">0.4</span></label>
+                                        <input type="range" data-input="main-bg-opacity" min="0" max="1" step="0.1" value="0.4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </details>
+                        <details class="bg-white rounded-lg border border-amber-200 p-3 transition">
+                            <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Viền Chữ</summary>
+                             <div class="mt-3 space-y-4">
+                                 <div class="flex items-center justify-between">
+                                    <label class="font-semibold text-xs text-amber-800">Bật/Tắt Viền</label>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" data-input="main-stroke-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div data-container="main-stroke-controls" class="space-y-4 hidden">
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Màu Viền</label>
+                                        <div class="grid grid-cols-5 gap-2 choice-selector main-stroke-color-selector"></div>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Độ dày viền: <span data-value-for="main-stroke-width">2</span></label>
+                                        <input type="range" data-input="main-stroke-width" min="0" max="20" step="1" value="2" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
+                        <details class="bg-white rounded-lg border border-amber-200 p-3 transition">
+                            <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Đổ Bóng</summary>
+                             <div class="mt-3 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <label class="font-semibold text-xs text-amber-800">Bật/Tắt Bóng</label>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" data-input="main-shadow-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div data-container="main-shadow-controls" class="space-y-4 hidden">
+                                     <div>
+                                        <label class="font-semibold text-xs text-amber-800">Màu Bóng</label>
+                                        <div class="grid grid-cols-5 gap-2 choice-selector main-shadow-color-selector"></div>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Độ mờ: <span data-value-for="main-shadow-blur">5</span></label>
+                                        <input type="range" data-input="main-shadow-blur" min="0" max="50" step="1" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Vị trí X: <span data-value-for="main-shadow-offsetX">5</span></label>
+                                        <input type="range" data-input="main-shadow-offsetX" min="-50" max="50" step="1" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Vị trí Y: <span data-value-for="main-shadow-offsetY">5</span></label>
+                                        <input type="range" data-input="main-shadow-offsetY" min="-50" max="50" step="1" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
                     </div>
                 </details>
                 <details class="bg-amber-50 rounded-lg border border-amber-200 p-4 transition" open>
-                    <summary class="flex justify-between items-center font-semibold text-amber-900">Ghi Chú</summary>
+                    <summary class="flex justify-between items-center font-semibold text-amber-900 cursor-pointer">Ghi Chú</summary>
                      <div class="mt-4 space-y-5">
-                        <div>
-                            <label class="font-semibold text-sm text-amber-800">Font chữ</label>
-                            <div class="grid grid-cols-2 gap-2 choice-selector note-font-selector"></div>
-                        </div>
-                        <div>
-                            <label class="font-semibold text-sm text-amber-800">Màu Sắc</label>
-                            <div class="grid grid-cols-5 gap-2 choice-selector note-color-selector"></div>
-                        </div>
-                        <div>
-                             <label class="font-semibold text-sm text-amber-800">Kích thước chữ: <span data-value-for="note-font-size">20</span></label>
-                             <input type="range" data-input="note-font-size" min="10" max="60" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <!-- Note Text Background Controls -->
-                        <div class="pt-4 border-t border-amber-200">
-                            <div class="flex items-center justify-between">
-                                <label class="font-semibold text-sm text-amber-800">Nền Văn Bản</label>
-                                <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                                    <input type="checkbox" data-input="note-bg-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                    <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                                </div>
-                            </div>
-                            <div data-container="note-bg-controls" class="space-y-5 mt-3 hidden">
+                        <details class="bg-white rounded-lg border border-amber-200 p-3 transition" open>
+                             <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Kiểu Chữ & Màu Sắc</summary>
+                             <div class="mt-3 space-y-4">
                                 <div>
-                                    <label class="font-semibold text-sm text-amber-800">Màu Nền</label>
-                                    <div class="grid grid-cols-5 gap-2 choice-selector note-bg-color-selector"></div>
+                                    <label class="font-semibold text-xs text-amber-800">Font chữ</label>
+                                    <div class="grid grid-cols-2 gap-2 choice-selector note-font-selector"></div>
                                 </div>
                                 <div>
-                                    <label class="font-semibold text-sm text-amber-800">Độ trong suốt: <span data-value-for="note-bg-opacity">0.4</span></label>
-                                    <input type="range" data-input="note-bg-opacity" min="0" max="1" step="0.1" value="0.4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    <label class="font-semibold text-xs text-amber-800">Màu Sắc</label>
+                                    <div class="grid grid-cols-5 gap-2 choice-selector note-color-selector"></div>
+                                </div>
+                                <div>
+                                     <label class="font-semibold text-xs text-amber-800">Kích thước chữ: <span data-value-for="note-font-size">20</span></label>
+                                     <input type="range" data-input="note-font-size" min="10" max="60" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                </div>
+                             </div>
+                        </details>
+                         <details class="bg-white rounded-lg border border-amber-200 p-3 transition">
+                            <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Nền Văn Bản</summary>
+                            <div class="mt-3 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <label class="font-semibold text-xs text-amber-800">Bật/Tắt Nền</label>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" data-input="note-bg-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div data-container="note-bg-controls" class="space-y-4 hidden">
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Màu Nền</label>
+                                        <div class="grid grid-cols-5 gap-2 choice-selector note-bg-color-selector"></div>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Độ trong suốt: <span data-value-for="note-bg-opacity">0.4</span></label>
+                                        <input type="range" data-input="note-bg-opacity" min="0" max="1" step="0.1" value="0.4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+                             </div>
+                        </details>
+                        <details class="bg-white rounded-lg border border-amber-200 p-3 transition">
+                            <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Viền Chữ</summary>
+                             <div class="mt-3 space-y-4">
+                                 <div class="flex items-center justify-between">
+                                    <label class="font-semibold text-xs text-amber-800">Bật/Tắt Viền</label>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" data-input="note-stroke-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div data-container="note-stroke-controls" class="space-y-4 hidden">
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Màu Viền</label>
+                                        <div class="grid grid-cols-5 gap-2 choice-selector note-stroke-color-selector"></div>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Độ dày viền: <span data-value-for="note-stroke-width">1</span></label>
+                                        <input type="range" data-input="note-stroke-width" min="0" max="10" step="1" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </details>
+                        <details class="bg-white rounded-lg border border-amber-200 p-3 transition">
+                            <summary class="flex justify-between items-center font-semibold text-sm text-amber-900 cursor-pointer">Đổ Bóng</summary>
+                             <div class="mt-3 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <label class="font-semibold text-xs text-amber-800">Bật/Tắt Bóng</label>
+                                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                        <input type="checkbox" data-input="note-shadow-visible" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+                                </div>
+                                <div data-container="note-shadow-controls" class="space-y-4 hidden">
+                                     <div>
+                                        <label class="font-semibold text-xs text-amber-800">Màu Bóng</label>
+                                        <div class="grid grid-cols-5 gap-2 choice-selector note-shadow-color-selector"></div>
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Độ mờ: <span data-value-for="note-shadow-blur">3</span></label>
+                                        <input type="range" data-input="note-shadow-blur" min="0" max="30" step="1" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Vị trí X: <span data-value-for="note-shadow-offsetX">3</span></label>
+                                        <input type="range" data-input="note-shadow-offsetX" min="-30" max="30" step="1" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                    <div>
+                                        <label class="font-semibold text-xs text-amber-800">Vị trí Y: <span data-value-for="note-shadow-offsetY">3</span></label>
+                                        <input type="range" data-input="note-shadow-offsetY" min="-30" max="30" step="1" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
                      </div>
                 </details>
             </div>
@@ -286,20 +398,24 @@
     <script type="module">
         // --- STATE & CONFIGURATION ---
         const state = {
-            mainText: "",
-            noteText: "",
+            mainText: "Lời hay ý đẹp\nNhiều dòng cho vui",
+            noteText: "Nguồn: Kinh điển Phật giáo",
             layout: 'layout1',
             main: { 
                 font: 'Playfair Display', 
                 color: '#FFFFFF', 
                 fontSize: 50,
-                background: { visible: false, color: '#000000', opacity: 0.4 }
+                background: { visible: false, color: '#000000', opacity: 0.4 },
+                stroke: { visible: false, color: '#000000', width: 2 },
+                shadow: { visible: false, color: 'rgba(0,0,0,0.75)', blur: 5, offsetX: 5, offsetY: 5 }
             },
             note: { 
                 font: 'Roboto', 
                 color: '#FFFFFF', 
                 fontSize: 20,
-                background: { visible: false, color: '#000000', opacity: 0.4 }
+                background: { visible: false, color: '#000000', opacity: 0.4 },
+                stroke: { visible: false, color: '#000000', width: 1 },
+                shadow: { visible: false, color: 'rgba(0,0,0,0.75)', blur: 3, offsetX: 3, offsetY: 3 }
             },
             logo: { size: 15, visible: false }
         };
@@ -310,7 +426,7 @@
             layout3: { name: 'Phá Cách', main: { v: 'bottom', h: 'center' }, logo: { v: 'top', h: 'right' }, note: { v: 'top', h: 'left' } }
         };
 
-	const fontProfiles = [ 'Roboto', 'Be Vietnam Pro', 'Playfair Display', 'Times New Roman', 'Arial', 'Dancing Script', 'Pacifico', 'Lobster', 'Alex Brush', 'Great Vibes' ]; // Thêm 2 font mới vào đây
+	    const fontProfiles = [ 'Roboto', 'Be Vietnam Pro', 'Playfair Display', 'Times New Roman', 'Arial', 'Dancing Script', 'Pacifico', 'Lobster', 'Alex Brush', 'Great Vibes' ];
         const colorProfiles = [ '#FFFFFF', '#000000', '#422006', '#FFFBEB', '#FBBF24', '#F59E0B', '#9A3412', '#D1C4A8', '#FEF3C7', '#1C1917', '#57534E' ];
 
         // --- DOM ELEMENTS ---
@@ -403,11 +519,12 @@
                 document.querySelectorAll(`.${containerClass}`).forEach(container => {
                     container.innerHTML = '';
                     let content = '';
-                    items.forEach((item) => {
+                    items.forEach((item, index) => {
+                        const id = `${name}-${container.closest('[id]').id}-${index}`;
                         content += `
                             <div class="choice-item">
-                                <input type="radio" name="${name}-${container.closest('[id]').id}" data-input="${name}" value="${item}" class="hidden">
-                                <label class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${type === 'color' ? `background-color:${item}` : `font-family:'${item}'`}">
+                                <input type="radio" id="${id}" name="${name}-${container.closest('[id]').id}" data-input="${name}" value="${item}" class="hidden">
+                                <label for="${id}" class="block cursor-pointer border-2 border-amber-200 rounded-lg p-2 text-center transition hover:border-yellow-500 h-full" style="${type === 'color' ? `background-color:${item}` : `font-family:'${item}'`}">
                                     ${type === 'color' ? '&nbsp;' : item}
                                 </label>
                             </div>`;
@@ -422,20 +539,25 @@
             createSelector('note-color-selector', colorProfiles, 'note-color', 'color');
             createSelector('main-bg-color-selector', colorProfiles, 'main-bg-color', 'color');
             createSelector('note-bg-color-selector', colorProfiles, 'note-bg-color', 'color');
+            createSelector('main-stroke-color-selector', colorProfiles, 'main-stroke-color', 'color');
+            createSelector('note-stroke-color-selector', colorProfiles, 'note-stroke-color', 'color');
+            createSelector('main-shadow-color-selector', colorProfiles, 'main-shadow-color', 'color');
+            createSelector('note-shadow-color-selector', colorProfiles, 'note-shadow-color', 'color');
             
             document.querySelectorAll('.layout-selector').forEach(container => {
                 container.innerHTML = '';
-                for (const key in layouts) {
+                Object.keys(layouts).forEach((key, index) => {
                     const layout = layouts[key];
+                    const id = `layout-${container.closest('[id]').id}-${index}`;
                     container.innerHTML += `
                         <div>
-                            <input type="radio" name="layout-${container.closest('[id]').id}" data-input="layout" value="${key}" class="hidden">
-                            <label class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
+                            <input type="radio" id="${id}" name="layout-${container.closest('[id]').id}" data-input="layout" value="${key}" class="hidden">
+                            <label for="${id}" class="block cursor-pointer border-2 border-transparent rounded-lg p-2 text-center transition hover:border-yellow-500">
                                 <div class="layout-preview-box">${generateLayoutPreview(layout)}</div>
                                 <span class="text-sm font-semibold mt-2 block">${layout.name}</span>
                             </label>
                         </div>`;
-                }
+                });
             });
         }
 
@@ -449,44 +571,49 @@
         }
         
         function updateAllInputs() {
-            // Text values
             document.querySelectorAll('[data-input="main-text"]').forEach(el => el.value = state.mainText);
             document.querySelectorAll('[data-input="note-text"]').forEach(el => el.value = state.noteText);
-            
-            // Layout
             document.querySelectorAll('input[data-input="layout"]').forEach(el => el.checked = el.value === state.layout);
-            
-            // Logo
             document.querySelectorAll('input[data-input="logo-visible"]').forEach(el => el.checked = state.logo.visible);
             document.querySelectorAll('[data-input="logo-size"]').forEach(el => el.value = state.logo.size);
             document.querySelectorAll('[data-value-for="logo-size"]').forEach(el => el.textContent = state.logo.size);
             document.querySelectorAll('[data-container="logo-size"]').forEach(c => c.style.display = state.logo.visible ? 'block' : 'none');
 
-            // Main Text Style
-            document.querySelectorAll('input[data-input="main-font"]').forEach(el => el.checked = el.value === state.main.font);
-            document.querySelectorAll('input[data-input="main-color"]').forEach(el => el.checked = el.value === state.main.color);
-            document.querySelectorAll('[data-input="main-font-size"]').forEach(el => el.value = state.main.fontSize);
-            document.querySelectorAll('[data-value-for="main-font-size"]').forEach(el => el.textContent = state.main.fontSize);
-            
-            // Main Text Background
-            document.querySelectorAll('input[data-input="main-bg-visible"]').forEach(el => el.checked = state.main.background.visible);
-            document.querySelectorAll('input[data-input="main-bg-color"]').forEach(el => el.checked = el.value === state.main.background.color);
-            document.querySelectorAll('[data-input="main-bg-opacity"]').forEach(el => el.value = state.main.background.opacity);
-            document.querySelectorAll('[data-value-for="main-bg-opacity"]').forEach(el => el.textContent = state.main.background.opacity);
-            document.querySelectorAll('[data-container="main-bg-controls"]').forEach(c => c.style.display = state.main.background.visible ? 'block' : 'none');
-            
-            // Note Text Style
-            document.querySelectorAll('input[data-input="note-font"]').forEach(el => el.checked = el.value === state.note.font);
-            document.querySelectorAll('input[data-input="note-color"]').forEach(el => el.checked = el.value === state.note.color);
-            document.querySelectorAll('[data-input="note-font-size"]').forEach(el => el.value = state.note.fontSize);
-            document.querySelectorAll('[data-value-for="note-font-size"]').forEach(el => el.textContent = state.note.fontSize);
-            
-            // Note Text Background
-            document.querySelectorAll('input[data-input="note-bg-visible"]').forEach(el => el.checked = state.note.background.visible);
-            document.querySelectorAll('input[data-input="note-bg-color"]').forEach(el => el.checked = el.value === state.note.background.color);
-            document.querySelectorAll('[data-input="note-bg-opacity"]').forEach(el => el.value = state.note.background.opacity);
-            document.querySelectorAll('[data-value-for="note-bg-opacity"]').forEach(el => el.textContent = state.note.background.opacity);
-            document.querySelectorAll('[data-container="note-bg-controls"]').forEach(c => c.style.display = state.note.background.visible ? 'block' : 'none');
+            const updateStyleInputs = (type) => {
+                const s = state[type];
+                document.querySelectorAll(`input[data-input="${type}-font"]`).forEach(el => el.checked = el.value === s.font);
+                document.querySelectorAll(`input[data-input="${type}-color"]`).forEach(el => el.checked = el.value === s.color);
+                document.querySelectorAll(`[data-input="${type}-font-size"]`).forEach(el => el.value = s.fontSize);
+                document.querySelectorAll(`[data-value-for="${type}-font-size"]`).forEach(el => el.textContent = s.fontSize);
+                
+                // Background
+                document.querySelectorAll(`input[data-input="${type}-bg-visible"]`).forEach(el => el.checked = s.background.visible);
+                document.querySelectorAll(`[data-container="${type}-bg-controls"]`).forEach(c => c.style.display = s.background.visible ? 'block' : 'none');
+                document.querySelectorAll(`input[data-input="${type}-bg-color"]`).forEach(el => el.checked = el.value === s.background.color);
+                document.querySelectorAll(`[data-input="${type}-bg-opacity"]`).forEach(el => el.value = s.background.opacity);
+                document.querySelectorAll(`[data-value-for="${type}-bg-opacity"]`).forEach(el => el.textContent = s.background.opacity);
+                
+                // Stroke
+                document.querySelectorAll(`input[data-input="${type}-stroke-visible"]`).forEach(el => el.checked = s.stroke.visible);
+                document.querySelectorAll(`[data-container="${type}-stroke-controls"]`).forEach(c => c.style.display = s.stroke.visible ? 'block' : 'none');
+                document.querySelectorAll(`input[data-input="${type}-stroke-color"]`).forEach(el => el.checked = el.value === s.stroke.color);
+                document.querySelectorAll(`[data-input="${type}-stroke-width"]`).forEach(el => el.value = s.stroke.width);
+                document.querySelectorAll(`[data-value-for="${type}-stroke-width"]`).forEach(el => el.textContent = s.stroke.width);
+
+                // Shadow
+                document.querySelectorAll(`input[data-input="${type}-shadow-visible"]`).forEach(el => el.checked = s.shadow.visible);
+                document.querySelectorAll(`[data-container="${type}-shadow-controls"]`).forEach(c => c.style.display = s.shadow.visible ? 'block' : 'none');
+                document.querySelectorAll(`input[data-input="${type}-shadow-color"]`).forEach(el => el.checked = el.value === s.shadow.color);
+                document.querySelectorAll(`[data-input="${type}-shadow-blur"]`).forEach(el => el.value = s.shadow.blur);
+                document.querySelectorAll(`[data-value-for="${type}-shadow-blur"]`).forEach(el => el.textContent = s.shadow.blur);
+                document.querySelectorAll(`[data-input="${type}-shadow-offsetX"]`).forEach(el => el.value = s.shadow.offsetX);
+                document.querySelectorAll(`[data-value-for="${type}-shadow-offsetX"]`).forEach(el => el.textContent = s.shadow.offsetX);
+                document.querySelectorAll(`[data-input="${type}-shadow-offsetY"]`).forEach(el => el.value = s.shadow.offsetY);
+                document.querySelectorAll(`[data-value-for="${type}-shadow-offsetY"]`).forEach(el => el.textContent = s.shadow.offsetY);
+            };
+
+            updateStyleInputs('main');
+            updateStyleInputs('note');
         }
 
         // --- EVENT HANDLING ---
@@ -498,35 +625,19 @@
                 }
             });
              document.body.addEventListener('click', (e) => {
-                const label = e.target.closest('label');
-                if (label) {
-                    const input = label.parentElement.querySelector('input[type="radio"]');
-                    if (input && input.dataset.input) {
-                        input.checked = true;
-                        handleInput(input.dataset.input, input.value);
-                    }
+                const button = e.target.closest('[data-action], #mobile-download-btn, .mobile-tool-btn');
+                if (button) {
+                    if (button.dataset.action === 'generate-image') handleImageGeneration();
+                    if (button.dataset.action === 'upload-image') button.closest('.control-panel-section').querySelector('.image-upload-input').click();
+                    if (button.id === 'mobile-download-btn') downloadBtn.click();
+                    if (button.classList.contains('mobile-tool-btn')) handleMobileNav(button);
                 }
-
-                if (e.target.closest('[data-action="generate-image"]')) handleImageGeneration();
-                if (e.target.closest('[data-action="upload-image"]')) e.target.closest('.control-panel-section').querySelector('.image-upload-input').click();
-                if (e.target.closest('#mobile-download-btn')) downloadBtn.click();
             });
 
             document.body.addEventListener('change', (e) => {
                 if (e.target.classList.contains('image-upload-input')) handleImageUpload(e.target.files[0]);
             });
-
-            const mobileToolBtns = document.querySelectorAll('.mobile-tool-btn');
-            mobileToolBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const panelId = btn.dataset.panel;
-                    if (!panelId) return;
-                    document.querySelectorAll('.mobile-panel-instance').forEach(p => p.classList.add('hidden'));
-                    document.getElementById(panelId).classList.remove('hidden');
-                    mobileToolBtns.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                });
-            });
+            
             document.querySelector('.mobile-tool-btn[data-panel="mobile-image-gen-panel"]').classList.add('active');
             
             downloadBtn.addEventListener('click', () => {
@@ -534,37 +645,31 @@
             });
         }
         
+        function handleMobileNav(button) {
+            const panelId = button.dataset.panel;
+            if (!panelId) return;
+            document.querySelectorAll('.mobile-panel-instance').forEach(p => p.classList.add('hidden'));
+            document.getElementById(panelId).classList.remove('hidden');
+            document.querySelectorAll('.mobile-tool-btn').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+        }
+
         function handleInput(type, value) {
-            switch(type) {
-                // Simple state
-                case 'main-text': state.mainText = value; break;
-                case 'note-text': state.noteText = value; break;
-                case 'layout': state.layout = value; break;
+            const parts = type.split('-');
+            const category = parts[0]; // main or note
+            const property = parts.slice(1).join('-'); // e.g., font, stroke-width
 
-                // Logo
-                case 'logo-visible': state.logo.visible = value; break;
-                case 'logo-size': state.logo.size = value; break;
+            const updateState = (obj, propParts, val) => {
+                 if (propParts.length === 1) obj[propParts[0]] = val;
+                 else if (obj[propParts[0]]) updateState(obj[propParts[0]], propParts.slice(1), val);
+            };
 
-                // Main text style
-                case 'main-font': state.main.font = value; break;
-                case 'main-color': state.main.color = value; break;
-                case 'main-font-size': state.main.fontSize = value; break;
-
-                // Main text background
-                case 'main-bg-visible': state.main.background.visible = value; break;
-                case 'main-bg-color': state.main.background.color = value; break;
-                case 'main-bg-opacity': state.main.background.opacity = value; break;
-
-                // Note text style
-                case 'note-font': state.note.font = value; break;
-                case 'note-color': state.note.color = value; break;
-                case 'note-font-size': state.note.fontSize = value; break;
-
-                // Note text background
-                case 'note-bg-visible': state.note.background.visible = value; break;
-                case 'note-bg-color': state.note.background.color = value; break;
-                case 'note-bg-opacity': state.note.background.opacity = value; break;
+            if (category === 'main' || category === 'note') {
+                updateState(state[category], property.split('-'), value);
+            } else {
+                updateState(state, [category], value);
             }
+            
             updateAllInputs();
             redrawCanvas();
         }
@@ -652,8 +757,27 @@
             const { x, y, textAlign } = getXY(position, margin, maxWidth, textBlockHeight, style);
             ctx.textAlign = textAlign;
 
+            // Reset effects from previous drawing operation
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.strokeStyle = 'transparent';
+            ctx.lineWidth = 0;
+
+            // Apply Shadow if enabled
+            if (style.shadow && style.shadow.visible) {
+                ctx.shadowColor = style.shadow.color;
+                ctx.shadowBlur = style.shadow.blur;
+                ctx.shadowOffsetX = style.shadow.offsetX;
+                ctx.shadowOffsetY = style.shadow.offsetY;
+            }
+
             // Draw background if enabled
             if (style.background && style.background.visible) {
+                 const originalShadowColor = ctx.shadowColor;
+                 ctx.shadowColor = 'transparent'; // Temporarily disable shadow for background rect
+
                 const hexToRgba = (hex, opacity) => {
                     let r = 0, g = 0, b = 0;
                     if (hex.length === 7) {
@@ -678,6 +802,17 @@
                     const rectHeight = fontSize + (padding * 2);
                     ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
                 });
+
+                ctx.shadowColor = originalShadowColor; // Restore shadow
+            }
+            
+            // Draw Stroke if enabled
+            if (style.stroke && style.stroke.visible && style.stroke.width > 0) {
+                ctx.strokeStyle = style.stroke.color;
+                ctx.lineWidth = style.stroke.width;
+                lines.forEach((line, index) => {
+                    ctx.strokeText(line, x, y + (index * lineHeight));
+                });
             }
 
             // Draw foreground text
@@ -685,33 +820,35 @@
             lines.forEach((line, index) => {
                 ctx.fillText(line, x, y + (index * lineHeight));
             });
+
+            // Clear shadow for next drawing operation to avoid affecting other elements
+            ctx.shadowColor = 'transparent';
         }
 
         function getXY(position, margin, blockWidth, blockHeight, style) {
             let x, y, textAlign;
+            const fontSize = (canvas.width / 1024) * (style.fontSize || 0);
+
             switch(position.h) {
                 case 'left': x = margin; textAlign = 'left'; break;
                 case 'right': x = canvas.width - margin; textAlign = 'right'; break;
                 default: x = canvas.width / 2; textAlign = 'center';
             }
             switch(position.v) {
-                case 'top': y = margin; break;
+                case 'top': y = margin + fontSize; break;
                 case 'bottom': y = canvas.height - margin - blockHeight; break;
-                default: y = (canvas.height / 2) - (blockHeight / 2);
-            }
-            if (position.v !== 'bottom') {
-                 y += fontSizeFromStyle(style);
+                default: y = (canvas.height / 2) - (blockHeight / 2) + (fontSize * 0.75); break;
             }
             return { x, y, textAlign };
         }
         
-        function fontSizeFromStyle(style) {
-             return (canvas.width / 1024) * (style.fontSize || 0);
-        }
-
         function wrapText(ctx, text, maxWidth) {
             const finalLines = [];
             text.split('\n').forEach(p => {
+                if (ctx.measureText(p).width < maxWidth) {
+                    finalLines.push(p);
+                    return;
+                }
                 let currentLine = '';
                 const words = p.split(' ');
                 if (words.length > 0) {
