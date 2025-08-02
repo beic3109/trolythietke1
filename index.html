@@ -654,20 +654,40 @@
             button.classList.add('active');
         }
 
-        function handleInput(type, value) {
+	function handleInput(type, value) {
+            // Tách loại và thuộc tính một cách an toàn hơn
             const parts = type.split('-');
-            const category = parts[0]; // main or note
-            const property = parts.slice(1).join('-'); // e.g., font, stroke-width
+            const category = parts[0]; // 'main', 'note', 'layout', etc.
+            const property = parts.slice(1).join('-'); // 'font', 'stroke-width', etc.
 
-            const updateState = (obj, propParts, val) => {
-                 if (propParts.length === 1) obj[propParts[0]] = val;
-                 else if (obj[propParts[0]]) updateState(obj[propParts[0]], propParts.slice(1), val);
-            };
-
-            if (category === 'main' || category === 'note') {
-                updateState(state[category], property.split('-'), value);
-            } else {
-                updateState(state, [category], value);
+            // Xử lý các trường hợp đặc biệt trước
+            if (type === 'main-text') {
+                state.mainText = value;
+            } else if (type === 'note-text') {
+                state.noteText = value;
+            } else if (type === 'layout') {
+                state.layout = value;
+            } else if (type === 'logo-visible') {
+                state.logo.visible = value;
+            } else if (type === 'logo-size') {
+                state.logo.size = value;
+            } 
+            // Xử lý các thuộc tính có cấu trúc (main/note)
+            else if (state[category] && state[category][property] !== undefined) {
+                 state[category][property] = value;
+            } 
+            // Xử lý các thuộc tính con có cấu trúc (background, stroke, shadow)
+            else {
+                const subParts = property.split('-');
+                if (state[category] && state[category][subParts[0]]) {
+                    const subCategory = subParts[0]; // 'bg', 'stroke', 'shadow'
+                    const subProperty = subParts.slice(1).join(''); // 'visible', 'color', 'opacity' etc.
+                    // Ánh xạ tên ngắn gọn tới tên đầy đủ trong state
+                    const map = { bg: 'background', stroke: 'stroke', shadow: 'shadow' };
+                    if (map[subCategory]) {
+                         state[category][map[subCategory]][subProperty] = value;
+                    }
+                }
             }
             
             updateAllInputs();
