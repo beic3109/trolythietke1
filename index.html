@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Be+Vietnam+Pro:wght@400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lobster&family=Pacifico&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Great+Vibes&display=swap" rel="stylesheet">
+	<link rel="manifest" href="manifest.json">
 	<style>
         :root {
             --mau-nen: #FDF8E1;
@@ -900,5 +901,72 @@
 
         init();
     </script>
+	<script>
+		// --- PWA: Đăng ký Service Worker và Xử lý cài đặt ---
+
+		// 1. Đăng ký Service Worker
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('/sw.js')
+					.then(registration => {
+						console.log('Service Worker đã được đăng ký thành công:', registration);
+					})
+					.catch(error => {
+						console.log('Đăng ký Service Worker thất bại:', error);
+					});
+			});
+		}
+
+		// 2. Xử lý sự kiện mời cài đặt ứng dụng
+		let deferredPrompt;
+		const installButton = document.createElement('button'); // Tạo một nút mời cài đặt
+
+		// Thiết kế style cho nút mời cài đặt
+		installButton.textContent = 'Cài đặt Ứng dụng';
+		installButton.style.position = 'fixed';
+		installButton.style.bottom = '20px';
+		installButton.style.right = '20px';
+		installButton.style.padding = '12px 20px';
+		installButton.style.backgroundColor = '#D97706'; // Màu cam
+		installButton.style.color = 'white';
+		installButton.style.border = 'none';
+		installButton.style.borderRadius = '8px';
+		installButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+		installButton.style.fontWeight = 'bold';
+		installButton.style.zIndex = '10000';
+		installButton.style.display = 'none'; // Ban đầu ẩn nút đi
+		document.body.appendChild(installButton);
+
+		window.addEventListener('beforeinstallprompt', (e) => {
+			// Ngăn trình duyệt hiển thị thông báo mặc định
+			e.preventDefault();
+			// Lưu lại sự kiện để có thể gọi lại sau
+			deferredPrompt = e;
+			// Hiển thị nút mời cài đặt mà bạn đã tạo
+			installButton.style.display = 'block';
+		});
+
+		installButton.addEventListener('click', (e) => {
+			// Ẩn nút đi sau khi người dùng nhấn
+			installButton.style.display = 'none';
+			// Hiển thị thông báo mời cài đặt của trình duyệt
+			deferredPrompt.prompt();
+			// Chờ đợi kết quả từ người dùng
+			deferredPrompt.userChoice.then((choiceResult) => {
+				if (choiceResult.outcome === 'accepted') {
+					console.log('Người dùng đã đồng ý cài đặt ứng dụng');
+				} else {
+					console.log('Người dùng đã từ chối cài đặt ứng dụng');
+				}
+				deferredPrompt = null;
+			});
+		});
+
+		window.addEventListener('appinstalled', (evt) => {
+			console.log('Ứng dụng đã được cài đặt.');
+			// Ẩn nút cài đặt nếu nó vẫn còn hiển thị
+			installButton.style.display = 'none';
+		});
+	</script>
 </body>
 </html>
