@@ -617,33 +617,69 @@
             updateStyleInputs('note');
         }
 
-        // --- EVENT HANDLING ---
+		// --- EVENT HANDLING ---
         function setupEventListeners() {
+            // Lắng nghe sự kiện input (Không thay đổi)
             document.body.addEventListener('input', (e) => {
                 if(e.target.dataset.input) {
                     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
                     handleInput(e.target.dataset.input, value);
                 }
             });
-             document.body.addEventListener('click', (e) => {
-                const button = e.target.closest('[data-action], #mobile-download-btn, .mobile-tool-btn');
-                if (button) {
-                    if (button.dataset.action === 'generate-image') handleImageGeneration();
-                    if (button.dataset.action === 'upload-image') button.closest('.control-panel-section').querySelector('.image-upload-input').click();
-                    if (button.id === 'mobile-download-btn') downloadBtn.click();
-                    if (button.classList.contains('mobile-tool-btn')) handleMobileNav(button);
-                }
-            });
 
+            // Lắng nghe sự kiện change cho việc tải ảnh lên (Không thay đổi)
             document.body.addEventListener('change', (e) => {
                 if (e.target.classList.contains('image-upload-input')) handleImageUpload(e.target.files[0]);
             });
-            
-            document.querySelector('.mobile-tool-btn[data-panel="mobile-image-gen-panel"]').classList.add('active');
-            
-            downloadBtn.addEventListener('click', () => {
-                downloadBtn.href = canvas.toDataURL('image/png');
+
+            // === BẮT ĐẦU PHẦN THAY THẾ ===
+            // Trình xử lý sự kiện CLICK mới, đã sửa lỗi cho iPhone
+            document.body.addEventListener('click', (e) => {
+                const button = e.target.closest('[data-action], #downloadBtn, #mobile-download-btn, .mobile-tool-btn');
+                
+                // Nếu không click vào nút nào có ý nghĩa thì bỏ qua
+                if (!button) return;
+
+                // Xử lý các nút điều hướng và hành động
+                if (button.classList.contains('mobile-tool-btn')) {
+                    handleMobileNav(button);
+                }
+                if (button.dataset.action === 'generate-image') {
+                    handleImageGeneration();
+                }
+                if (button.dataset.action === 'upload-image') {
+                    button.closest('.control-panel-section').querySelector('.image-upload-input').click();
+                }
+
+                // Xử lý các nút TẢI VỀ (cả desktop và mobile)
+                if (button.id === 'downloadBtn' || button.id === 'mobile-download-btn') {
+                    e.preventDefault(); // Ngăn hành vi mặc định của thẻ <a>
+
+                    const dataURL = canvas.toDataURL('image/png');
+                    // Kiểm tra có phải thiết bị iOS hay không
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+                    if (isIOS) {
+                        // Trên iPhone/iPad: Mở ảnh ở tab mới để người dùng tự lưu thủ công
+                        const newTab = window.open();
+                        newTab.document.body.style.margin = "0";
+                        newTab.document.body.style.background = "#222";
+                        newTab.document.write(`<img src="${dataURL}" style="width:100%; height:auto; display:block;">`);
+                    } else {
+                        // Trên các thiết bị khác (Android, Máy tính): Tự động tải về
+                        const link = document.createElement('a');
+                        link.href = dataURL;
+                        link.download = 'thiep-phat-giao.png';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }
             });
+            // === KẾT THÚC PHẦN THAY THẾ ===
+
+            // Kích hoạt panel đầu tiên trên mobile (Không thay đổi)
+            document.querySelector('.mobile-tool-btn[data-panel="mobile-image-gen-panel"]').classList.add('active');
         }
         
         function handleMobileNav(button) {
