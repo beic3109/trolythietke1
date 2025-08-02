@@ -953,56 +953,65 @@
 			});
 		}
 
-		// 2. Xử lý sự kiện mời cài đặt ứng dụng
-		let deferredPrompt;
-		const installButton = document.createElement('button'); // Tạo một nút mời cài đặt
+	// 2. Xử lý sự kiện mời cài đặt ứng dụng (Tự động ẩn sau 3 giây)
+    let deferredPrompt;
+    let installPromptTimer; // Biến để lưu trữ bộ đếm thời gian
+    const installButton = document.createElement('button');
 
-		// Thiết kế style cho nút mời cài đặt
-		installButton.textContent = 'Cài đặt Ứng dụng';
-		installButton.style.position = 'fixed';
-		installButton.style.bottom = '20px';
-		installButton.style.right = '20px';
-		installButton.style.padding = '12px 20px';
-		installButton.style.backgroundColor = '#D97706'; // Màu cam
-		installButton.style.color = 'white';
-		installButton.style.border = 'none';
-		installButton.style.borderRadius = '8px';
-		installButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-		installButton.style.fontWeight = 'bold';
-		installButton.style.zIndex = '10000';
-		installButton.style.display = 'none'; // Ban đầu ẩn nút đi
-		document.body.appendChild(installButton);
+    // Thiết kế style cho nút (Không thay đổi)
+    installButton.textContent = 'Cài đặt Ứng dụng';
+    installButton.style.position = 'fixed';
+    installButton.style.bottom = '20px';
+    installButton.style.right = '20px';
+    installButton.style.padding = '12px 20px';
+    installButton.style.backgroundColor = '#D97706';
+    installButton.style.color = 'white';
+    installButton.style.border = 'none';
+    installButton.style.borderRadius = '8px';
+    installButton.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    installButton.style.fontWeight = 'bold';
+    installButton.style.zIndex = '10000';
+    installButton.style.display = 'none';
+    document.body.appendChild(installButton);
 
-		window.addEventListener('beforeinstallprompt', (e) => {
-			// Ngăn trình duyệt hiển thị thông báo mặc định
-			e.preventDefault();
-			// Lưu lại sự kiện để có thể gọi lại sau
-			deferredPrompt = e;
-			// Hiển thị nút mời cài đặt mà bạn đã tạo
-			installButton.style.display = 'block';
-		});
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // Hiển thị nút mời cài đặt
+        installButton.style.display = 'block';
 
-		installButton.addEventListener('click', (e) => {
-			// Ẩn nút đi sau khi người dùng nhấn
-			installButton.style.display = 'none';
-			// Hiển thị thông báo mời cài đặt của trình duyệt
-			deferredPrompt.prompt();
-			// Chờ đợi kết quả từ người dùng
-			deferredPrompt.userChoice.then((choiceResult) => {
-				if (choiceResult.outcome === 'accepted') {
-					console.log('Người dùng đã đồng ý cài đặt ứng dụng');
-				} else {
-					console.log('Người dùng đã từ chối cài đặt ứng dụng');
-				}
-				deferredPrompt = null;
-			});
-		});
+        // *** BẮT ĐẦU THAY ĐỔI ***
+        // Đặt hẹn giờ để tự động ẩn nút sau 3 giây
+        installPromptTimer = setTimeout(() => {
+            installButton.style.display = 'none';
+        }, 3000); // 3000 mili-giây = 3 giây
+        // *** KẾT THÚC THAY ĐỔI ***
+    });
 
-		window.addEventListener('appinstalled', (evt) => {
-			console.log('Ứng dụng đã được cài đặt.');
-			// Ẩn nút cài đặt nếu nó vẫn còn hiển thị
-			installButton.style.display = 'none';
-		});
+    installButton.addEventListener('click', (e) => {
+        // *** BẮT ĐẦU THAY ĐỔI ***
+        // Hủy bỏ việc tự động ẩn nếu người dùng đã nhấn nút
+        if (installPromptTimer) {
+            clearTimeout(installPromptTimer);
+        }
+        // *** KẾT THÚC THAY ĐỔI ***
+
+        installButton.style.display = 'none';
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('Người dùng đã đồng ý cài đặt ứng dụng');
+            } else {
+                console.log('Người dùng đã từ chối cài đặt ứng dụng');
+            }
+            deferredPrompt = null;
+        });
+    });
+
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('Ứng dụng đã được cài đặt.');
+        installButton.style.display = 'none';
+    });
 	</script>
 </body>
 </html>
