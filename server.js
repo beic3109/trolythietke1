@@ -40,29 +40,65 @@ app.post('/api/generate-image', async (req, res) => {
     const apiHost = 'https://api.stability.ai';
 
     try {
-        // Gọi đến API của Stability.ai từ backend
-        const response = await fetch(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                Authorization: `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-                text_prompts: [{ text: prompt }],
-                cfg_scale: 7,
-                height: 1024,
-                width: 1024,
-                steps: 30,
-                samples: 1,
-            }),
-        });
+		// ĐOẠN MÃ MỚI ĐỂ THAY THẾ
+		try {
+			const response = await fetch(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					Authorization: `Bearer ${apiKey}`,
+				},
+				body: JSON.stringify({
+					text_prompts: [{ text: prompt }],
+					cfg_scale: 7,
+					height: 1024,
+					width: 1024,
+					steps: 30,
+					samples: 1,
+				}),
+			});
 
-        if (!response.ok) {
-            // Nếu có lỗi, ném ra lỗi để khối catch xử lý
-            const errorText = await response.text();
-            throw new Error(`Non-200 response from Stability AI: ${errorText}`);
-        }
+			// --- BẮT ĐẦU PHẦN THAY ĐỔI ---
+
+			if (!response.ok) {
+				// Cố gắng đọc và phân tích chi tiết lỗi từ API
+				const errorText = await response.text();
+				let errorDetails;
+				try {
+					errorDetails = JSON.parse(errorText);
+				} catch (e) {
+					errorDetails = errorText;
+				}
+
+				// Tạo lỗi tùy chỉnh và đính kèm chi tiết vào
+				const error = new Error('Non-200 response from Stability AI');
+				error.apiResponse = errorDetails;
+				throw error;
+			}
+
+			const responseJSON = await response.json();
+			res.json(responseJSON);
+
+		} catch (error) {
+			// Xây dựng đối tượng log có cấu trúc
+			const logData = {
+				level: "error",
+				message: "Error calling Stability API",
+				details: error.apiResponse || error.message
+			};
+
+			// Ghi log dưới dạng chuỗi JSON để Better Stack không cắt bớt
+			console.error(JSON.stringify(logData));
+
+			// Trả lỗi về cho frontend
+			res.status(500).json({
+				error: 'Failed to generate image.',
+				details: error.apiResponse || error.message
+			});
+
+			// --- KẾT THÚC PHẦN THAY ĐỔI ---
+		}
 
         const responseJSON = await response.json();
         // Gửi kết quả (dữ liệu ảnh base64) về lại cho frontend
