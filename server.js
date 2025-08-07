@@ -81,26 +81,21 @@ app.post('/api/generate-image', async (req, res) => {
 			res.json(responseJSON);
 
 			catch (error) {
-				// Xây dựng đối tượng log có cấu trúc
+				// ... (phần code ghi log của bạn giữ nguyên)
 				const logData = {
 					level: "error",
 					message: "Error calling Stability API",
 					details: error.apiResponse || error.message
 				};
-
-				// Ghi log dưới dạng chuỗi JSON
 				console.error(JSON.stringify(logData));
 
-				// --- BẮT ĐẦU PHẦN SỬA LỖI ---
-				
-				// Chỉ gửi phản hồi lỗi nếu chưa có bất kỳ phản hồi nào được gửi đi trước đó
+				// KIỂM TRA trước khi gửi phản hồi lỗi
 				if (!res.headersSent) {
 					res.status(500).json({
 						error: 'Failed to generate image.',
 						details: error.apiResponse || error.message
 					});
 				}
-				// --- KẾT THÚC PHẦN SỬA LỖI ---
 			}
 
         const responseJSON = await response.json();
