@@ -20,19 +20,23 @@ app.get('/', (req, res) => {
 });
 
 // Route API proxy để gọi đến Stability AI một cách an toàn
+// Route API proxy để gọi đến Stability AI một cách an toàn
+// (Phiên bản hoàn chỉnh, đã sửa lỗi và ghi log JSON)
 app.post('/api/generate-image', async (req, res) => {
-    // Lấy prompt từ body của request gửi từ frontend
     const { prompt } = req.body;
 
     if (!prompt) {
         return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Lấy API key từ biến môi trường trên server Render
     const apiKey = process.env.STABILITY_API_KEY;
 
     if (!apiKey) {
-        console.error('Stability API key not found in environment variables.');
+        const logData = {
+            level: "error",
+            message: "Stability API key not found in environment variables."
+        };
+        console.error(JSON.stringify(logData));
         return res.status(500).json({ error: 'API key is not configured on the server.' });
     }
 
@@ -40,68 +44,56 @@ app.post('/api/generate-image', async (req, res) => {
     const apiHost = 'https://api.stability.ai';
 
     try {
-		// ĐOẠN MÃ MỚI ĐỂ THAY THẾ
-			try {
-				const response = await fetch(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						Accept: 'application/json',
-						Authorization: `Bearer ${apiKey}`,
-					},
-					body: JSON.stringify({
-						text_prompts: [{ text: prompt }],
-						cfg_scale: 7,
-						height: 1024,
-						width: 1024,
-						steps: 30,
-						samples: 1,
-					}),
-				});
+        const response = await fetch(`${apiHost}/v1/generation/${engineId}/text-to-image`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+                text_prompts: [{ text: prompt }],
+                cfg_scale: 7,
+                height: 1024,
+                width: 1024,
+                steps: 30,
+                samples: 1,
+            }),
+        });
 
-				if (!response.ok) {
-					const errorText = await response.text();
-					let errorDetails;
-					try {
-						errorDetails = JSON.parse(errorText);
-					} catch (e) {
-						errorDetails = errorText;
-					}
+        if (!response.ok) {
+            const errorText = await response.text();
+            let errorDetails;
+            try {
+                errorDetails = JSON.parse(errorText);
+            } catch (e) {
+                errorDetails = errorText;
+            }
 
-					const error = new Error('Non-200 response from Stability AI');
-					error.apiResponse = errorDetails;
-					throw error;
-				}
-
-				const responseJSON = await response.json();
-				res.json(responseJSON);
-
-			} // <== ĐẢM BẢO DẤU NGOẶC NHỌN NÀY TỒN TẠI
-			catch (error) {
-				const logData = {
-					level: "error",
-					message: "Error calling Stability AI",
-					details: error.apiResponse || error.message
-				};
-
-				console.error(JSON.stringify(logData));
-
-				// Kiểm tra trước khi gửi phản hồi lỗi
-				if (!res.headersSent) {
-					res.status(500).json({
-						error: 'Failed to generate image.',
-						details: error.apiResponse || error.message
-					});
-				}
-			}
+            const error = new Error('Non-200 response from Stability AI');
+            error.apiResponse = errorDetails;
+            throw error;
+        }
 
         const responseJSON = await response.json();
-        // Gửi kết quả (dữ liệu ảnh base64) về lại cho frontend
         res.json(responseJSON);
 
     } catch (error) {
-        console.error('Error calling Stability API:', error.message);
-        res.status(500).json({ error: 'Failed to generate image.', details: error.message });
+        const logData = {
+            level: "error",
+            message: "Error calling Stability API",
+            details: error.apiResponse || error.message
+        };
+
+        console.error(JSON.stringify(logData));
+
+        // Kiểm tra trước khi gửi phản hồi lỗi
+        if (!res.headersSent) {
+            res.status(500).json({
+                error: 'Failed to generate image.',
+                details: error.apiResponse || error.message
+            });
+        }
     }
 });
 
