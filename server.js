@@ -80,25 +80,28 @@ app.post('/api/generate-image', async (req, res) => {
 			const responseJSON = await response.json();
 			res.json(responseJSON);
 
-		} catch (error) {
-			// Xây dựng đối tượng log có cấu trúc
-			const logData = {
-				level: "error",
-				message: "Error calling Stability API",
-				details: error.apiResponse || error.message
-			};
+			catch (error) {
+				// Xây dựng đối tượng log có cấu trúc
+				const logData = {
+					level: "error",
+					message: "Error calling Stability API",
+					details: error.apiResponse || error.message
+				};
 
-			// Ghi log dưới dạng chuỗi JSON để Better Stack không cắt bớt
-			console.error(JSON.stringify(logData));
+				// Ghi log dưới dạng chuỗi JSON
+				console.error(JSON.stringify(logData));
 
-			// Trả lỗi về cho frontend
-			res.status(500).json({
-				error: 'Failed to generate image.',
-				details: error.apiResponse || error.message
-			});
-
-			// --- KẾT THÚC PHẦN THAY ĐỔI ---
-		}
+				// --- BẮT ĐẦU PHẦN SỬA LỖI ---
+				
+				// Chỉ gửi phản hồi lỗi nếu chưa có bất kỳ phản hồi nào được gửi đi trước đó
+				if (!res.headersSent) {
+					res.status(500).json({
+						error: 'Failed to generate image.',
+						details: error.apiResponse || error.message
+					});
+				}
+				// --- KẾT THÚC PHẦN SỬA LỖI ---
+			}
 
         const responseJSON = await response.json();
         // Gửi kết quả (dữ liệu ảnh base64) về lại cho frontend
